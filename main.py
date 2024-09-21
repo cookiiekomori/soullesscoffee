@@ -29,19 +29,19 @@ for filename in os.listdir("./cogs"):
 		bot.load_extension("cogs." + filename[:-3])
 
 
-@bot.slash_command(description='Загрузить модуль бота') #эта команда отвечает за загрузку когов
+@bot.slash_command(description='Загрузить модуль бота')
 @commands.is_owner()
 async def load(inter: disnake.CommandInteraction, module: str = commands.Param(name="module", description="Название модуля")):
 	bot.load_extension(f"cogs.{module}")
 	await inter.response.send_message(f"Загружен модуль `{module}`",ephemeral=True)
 
-@bot.slash_command(description='Выгрузить модуль бота') #эта команда отвечает за выгрузку когов (отключение)
+@bot.slash_command(description='Выгрузить модуль бота')
 @commands.is_owner()
 async def unload(inter: disnake.CommandInteraction, module: str = commands.Param(name="module", description="Название модуля")):
 	bot.unload_extension(f"cogs.{module}")
 	await inter.response.send_message(f"Выгружен модуль `{module}`",ephemeral=True)
     
-@bot.slash_command(description="Перезагрузить модуль бота") #эта команда отвечает за перезагрузку когов (т.е не обязательно перезагружать бота, можно перезагрузить сам ког)
+@bot.slash_command(description="Перезагрузить модуль бота")
 @commands.is_owner()
 async def reload(inter: disnake.CommandInteraction, module: str = commands.Param(name="module", description="Название модуля")):
 	bot.reload_extension(f"cogs.{module}")
