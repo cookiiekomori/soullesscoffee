@@ -26,8 +26,5 @@ jobs:
         git commit -m "Update README.md" || echo "No changes to commit"
 
     - name: Push changes
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Используйте встроенный токен
       run: |
-        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/cookiiekomori/soullesscoffee.git
         git push
