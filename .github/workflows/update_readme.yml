@@ -13,8 +13,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Update README.md
+    - name: Create or update README.md
       run: |
+        # Проверяем, существует ли файл README.md
+        if [ ! -f soullesscoffee/README.md ]; then
+          echo "# Soulless Coffee" > soullesscoffee/README.md
+        fi
         echo "## Soulless Coffee" >> soullesscoffee/README.md
         echo "<a href=\"https://discord.gg/ZSUpv25GRz\"><img src=\"https://img.shields.io/discord/907577663810576405.svg?style=flat&label=Join%20Community&color=7289DA\" alt=\"Join Community Badge\"/></a>" >> soullesscoffee/README.md
 
