@@ -18,6 +18,12 @@ jobs:
         # Очищаем файл README.md и записываем новое содержимое
         echo "# soullesscoffee" > README.md
         echo '<a href="https://discord.gg/ZSUpv25GRz"><img src="https://img.shields.io/discord/907577663810576405.svg?style=flat&label=Join%20Community&color=7289DA" alt="Join Community Badge"/></a>' >> README.md
+        echo "" >> README.md
+        echo "## Участники" >> README.md
+        echo "- Участник 1" >> README.md
+        echo "- Участник 2" >> README.md
+        echo "- Участник 3" >> README.md
+        # Добавьте больше участников по мере необходимости
 
     - name: Commit changes
       run: |
