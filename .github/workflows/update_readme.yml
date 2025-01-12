@@ -20,12 +20,10 @@ jobs:
         echo "Contents of the current directory:"
         ls -la
 
-    - name: Create or update README.md
+    - name: Clear and update README.md
       run: |
-        # Проверяем, существует ли файл README.md в корне репозитория
-        if [ ! -f README.md ]; then
-          echo "# Soulless Coffee" > README.md
-        fi
+        # Очищаем файл README.md, если он существует, и записываем новый контент
+        echo "# Soulless Coffee" > README.md
         echo "## Soulless Coffee" >> README.md
         echo "<a href=\"https://discord.gg/ZSUpv25GRz\"><img src=\"https://img.shields.io/discord/907577663810576405.svg?style=flat&label=Join%20Community&color=7289DA\" alt=\"Join Community Badge\"/></a>" >> README.md
 
