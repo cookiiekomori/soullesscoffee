@@ -17,7 +17,7 @@ jobs:
       run: |
         # Очищаем файл README.md и записываем новое содержимое
         echo "# soullesscoffee" > README.md
-        echo '<a href="https://discord.gg/ZSUpv25GRz"><img src="https://img.shields.io/badge/Total%20Members-100-brightgreen" alt="Total Members Badge"/></a>' >> README.md
+        echo '<a href="https://discord.gg/ZSUpv25GRz"><img src="https://img.shields.io/badge/Total%20Members-1274-7289DA?style=flat&logo=discord" alt="Total Members Badge"/></a>' >> README.md
 
     - name: Commit changes
       run: |
