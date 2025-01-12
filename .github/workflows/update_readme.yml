@@ -13,19 +13,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Debug
-      run: |
-        echo "Current directory:"
-        pwd
-        echo "Contents of the current directory:"
-        ls -la
-
     - name: Clear and update README.md
       run: |
-        # Очищаем файл README.md, если он существует, и записываем новый контент
-        echo "# Soulless Coffee" > README.md
-        echo "## Soulless Coffee" >> README.md
-        echo "<a href=\"https://discord.gg/ZSUpv25GRz\"><img src=\"https://img.shields.io/discord/907577663810576405.svg?style=flat&label=Join%20Community&color=7289DA\" alt=\"Join Community Badge\"/></a>" >> README.md
+        # Очищаем файл README.md и записываем новое содержимое
+        echo "# soullesscoffee" > README.md
+        echo '<a href="https://discord.gg/ZSUpv25GRz"><img src="https://img.shields.io/discord/907577663810576405.svg?style=flat&label=Join%20Community&color=7289DA" alt="Join Community Badge"/></a>' >> README.md
 
     - name: Commit changes
       run: |
