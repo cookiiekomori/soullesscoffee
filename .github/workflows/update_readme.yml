@@ -1,13 +1,9 @@
-- name: Update README.md
-  run: |
-    echo "## Soulless Coffee" >> README.md
-    echo "<a href=\"https://discord.gg/ZSUpv25GRz\"><img src=\"https://img.shields.io/discord/907577663810576405.svg?style=flat&label=Join%20Community&color=7289DA\" alt=\"Join Community Badge\"/></a>" >> README.md
-
+name: Update README
 
 on:
-  schedule:
-    - cron: '0 * * * *'  # Каждый час
-
+  push:
+    branches:
+      - main  # Укажите вашу основную ветку
 
 jobs:
   update-readme:
