@@ -30,6 +30,12 @@ async def on_ready():
     print(f"-------------------------\nУспешно запущен бот, {bot.user.name}")
     bot.loop.create_task(status_task(bot))
 
+async def get_member_count():
+    guild = bot.get_guild(907577663810576405)  # Замените на ваш ID сервера
+    if guild:
+        return guild.member_count
+    return 0
+
 @bot.event
 async def on_command(ctx):
     print(f"Команда '{ctx.command}' была вызвана пользователем {ctx.author} в канале {ctx.channel}.")
