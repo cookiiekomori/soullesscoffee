@@ -20,14 +20,14 @@ jobs:
 
     - name: Commit changes
       run: |
-        git config --local user.email "cookiekomori@outlook.com"  # Укажите ваш email
-        git config --local user.name "cookiiekomori"  # Укажите ваше имя
+        git config --local user.email "you@example.com"  # Укажите ваш email
+        git config --local user.name "Your Name"  # Укажите ваше имя
         git add README.md
         git commit -m "Update README.md" || echo "No changes to commit"
 
     - name: Push changes
       env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_TOKEN }}  # Используйте ваш токен
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Используйте встроенный токен
       run: |
         git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/cookiiekomori/soullesscoffee.git
         git push
