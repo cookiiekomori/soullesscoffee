@@ -15,7 +15,6 @@ jobs:
 
     - name: Create or update README.md
       run: |
-        # Проверяем, существует ли файл README.md
         if [ ! -f README.md ]; then
           echo "# Soulless Coffee" > README.md
         fi
@@ -31,4 +30,4 @@ jobs:
 
     - name: Push changes
       run: |
-        git push
+        git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/cookiiekomori/soullesscoffee.git HEAD:main
