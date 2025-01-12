@@ -13,19 +13,27 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Debug
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Contents of soullesscoffee directory:"
+        ls -la soullesscoffee
+
     - name: Create or update README.md
       run: |
-        if [ ! -f README.md ]; then
-          echo "# Soulless Coffee" > README.md
+        # Проверяем, существует ли файл README.md в папке soullesscoffee
+        if [ ! -f soullesscoffee/README.md ]; then
+          echo "# Soulless Coffee" > soullesscoffee/README.md
         fi
-        echo "## Soulless Coffee" >> README.md
-        echo "<a href=\"https://discord.gg/ZSUpv25GRz\"><img src=\"https://img.shields.io/discord/907577663810576405.svg?style=flat&label=Join%20Community&color=7289DA\" alt=\"Join Community Badge\"/></a>" >> README.md
+        echo "## Soulless Coffee" >> soullesscoffee/README.md
+        echo "<a href=\"https://discord.gg/ZSUpv25GRz\"><img src=\"https://img.shields.io/discord/907577663810576405.svg?style=flat&label=Join%20Community&color=7289DA\" alt=\"Join Community Badge\"/></a>" >> soullesscoffee/README.md
 
     - name: Commit changes
       run: |
         git config --local user.email "cookiekomori@outlook.com"  # Укажите ваш email
         git config --local user.name "cookiiekomori"  # Укажите ваше имя
-        git add README.md
+        git add soullesscoffee/README.md
         git commit -m "Update README.md" || echo "No changes to commit"
 
     - name: Push changes
