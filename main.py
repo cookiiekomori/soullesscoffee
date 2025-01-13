@@ -52,7 +52,12 @@ async def status_task(bot):
     ]
     while True:
         for status in statuses:
-            await bot.change_presence(activity=disnake.Streaming(type=1, url="https://www.twitch.tv/videos/225796573?t=00h00m30s", name=status))
+            try:
+                await bot.change_presence(activity=disnake.Streaming(type=1, url="https://www.twitch.tv/videos/225796573?t=00h00m30s", name=status))
+            except ClientConnectionResetError:
+                print("Connection reset, attempting to reconnect...")
+                await asyncio.sleep(5)  # Подождите перед повторной попыткой
+                break  # Выйдите из текущего цикла for и начните заново
             await asyncio.sleep(15)
 
 # Загрузка модулей
@@ -60,17 +65,29 @@ for filename in os.listdir("cogs"):
     if filename.endswith(".py"):
         bot.load_extension("cogs." + filename[:-3])
 
-cogs = [filename[:-3] for filename in os.listdir("cogs") if filename.endswith(".py")]
+# Функция для получения списка когов
+def get_cogs():
+    return [filename[:-3] for filename in os.listdir("cogs") if filename.endswith(".py")]
+
+# Статический список когов с дескрипшенами
+static_cogs = [
+    disnake.OptionChoice(name="ctx_commands", value="ctx_commands"),
+    disnake.OptionChoice(name="embed", value="embed"),
+    disnake.OptionChoice(name="logging", value="logging"),
+]  # Замените на ваши названия когов
 
 @bot.slash_command(description="Выводит список доступных модулей")
 @commands.is_owner()
 async def list_cogs(inter: disnake.CommandInteraction):
-    cog_list = "\n".join(cogs)
+    cog_list = "\n".join(get_cogs())
     await inter.response.send_message(f"Список модулей:```\n{cog_list}\n```", ephemeral=True)
 
 @bot.slash_command(description="Загрузить модуль бота")
 @commands.is_owner()
-async def load(inter: disnake.CommandInteraction, module: str):
+async def load(inter: disnake.CommandInteraction, 
+               module: str = disnake.Option(name="module", 
+                                            description="Выберите модуль для загрузки", 
+                                            choices=static_cogs)):
     try:
         bot.load_extension(f"cogs.{module}")
         await inter.response.send_message(f"Загружен модуль `{module}`", ephemeral=True)
@@ -79,7 +96,10 @@ async def load(inter: disnake.CommandInteraction, module: str):
 
 @bot.slash_command(description="Выгрузить модуль бота")
 @commands.is_owner()
-async def unload(inter: disnake.CommandInteraction, module: str):
+async def unload(inter: disnake.CommandInteraction, 
+                 module: str = disnake.Option(name="module", 
+                                              description="Выберите модуль для выгрузки", 
+                                              choices=static_cogs)):
     try:
         bot.unload_extension(f"cogs.{module}")
         await inter.response.send_message(f"Выгружен модуль `{module}`", ephemeral=True)
@@ -88,12 +108,18 @@ async def unload(inter: disnake.CommandInteraction, module: str):
 
 @bot.slash_command(description="Перезагрузить модуль бота")
 @commands.is_owner()
-async def reload(inter: disnake.CommandInteraction, module: str):
+async def reload(inter: disnake.CommandInteraction, 
+                  module: str = disnake.Option(name="module", 
+                                               description="Выберите модуль для перезагрузки", 
+                                               choices=static_cogs)):
     try:
         bot.reload_extension(f"cogs.{module}")
         await inter.response.send_message(f"Перезагружен модуль `{module}`", ephemeral=True)
     except Exception as e:
         await inter.response.send_message(f"Ошибка при перезагрузке модуля `{module}`: {e}", ephemeral=True)
+
+
+
 
 def is_owner_or_cooldown():
     def predicate(ctx):
