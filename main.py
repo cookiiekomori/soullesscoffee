@@ -7,12 +7,12 @@ import aiohttp
 
 # Загрузка конфигурации
 def load_config():
-    with open('C:\\Users\\cooki\\Desktop\\Homework\\soullesscoffee\\config.json', 'r', encoding='utf-8') as f:
+    with open('config.json', 'r', encoding='utf-8') as f:
         return json.load(f)
 
 # Сохранение конфигурации
 def save_config(config):
-    with open('C:\\Users\\cooki\\Desktop\\Homework\\soullesscoffee\\config.json', 'w', encoding='utf-8') as f:
+    with open('config.json', 'w', encoding='utf-8') as f:
         json.dump(config, f, ensure_ascii=False, indent=4)
 
 # Загрузка конфигурации
@@ -56,11 +56,11 @@ async def status_task(bot):
             await asyncio.sleep(15)
 
 # Загрузка модулей
-for filename in os.listdir("C:\\Users\\cooki\\Desktop\\Homework\\soullesscoffee\\cogs"):
+for filename in os.listdir(".cogs"):
     if filename.endswith(".py"):
         bot.load_extension("cogs." + filename[:-3])
 
-cogs = [filename[:-3] for filename in os.listdir("C:\\Users\\cooki\\Desktop\\Homework\\soullesscoffee\\cogs") if filename.endswith(".py")]
+cogs = [filename[:-3] for filename in os.listdir(".cogs") if filename.endswith(".py")]
 
 @bot.slash_command(description="Выводит список доступных модулей")
 @commands.is_owner()

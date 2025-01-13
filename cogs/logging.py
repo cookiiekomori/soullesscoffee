@@ -5,7 +5,7 @@ import aiohttp
 
 # Функция для загрузки конфигурации
 def load_config():
-    with open('C:\\Users\\cooki\\Desktop\\Homework\\soullesscoffee\\config.json', 'r', encoding='utf-8') as f:
+    with open('config.json', 'r', encoding='utf-8') as f:
         return json.load(f)
 
 # Загрузка конфигурации
