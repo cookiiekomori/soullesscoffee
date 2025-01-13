@@ -56,11 +56,11 @@ async def status_task(bot):
             await asyncio.sleep(15)
 
 # Загрузка модулей
-for filename in os.listdir(".cogs"):
+for filename in os.listdir("cogs"):
     if filename.endswith(".py"):
         bot.load_extension("cogs." + filename[:-3])
 
-cogs = [filename[:-3] for filename in os.listdir(".cogs") if filename.endswith(".py")]
+cogs = [filename[:-3] for filename in os.listdir("cogs") if filename.endswith(".py")]
 
 @bot.slash_command(description="Выводит список доступных модулей")
 @commands.is_owner()
