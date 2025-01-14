@@ -65,4 +65,3 @@ class CTX_Commands(commands.Cog):
 
 def setup(bot):
     bot.add_cog(CTX_Commands(bot))
-    print(f"Подключение модуля CTX_Commands...")

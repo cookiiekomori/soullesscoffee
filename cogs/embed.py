@@ -251,5 +251,4 @@ class Embed(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Embed(bot))
-    print(f"Подключение модуля Embed...")
 

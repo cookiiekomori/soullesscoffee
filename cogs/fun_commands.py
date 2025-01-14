@@ -81,4 +81,3 @@ class FunCommands(commands.Cog):
 # Функция для добавления cog в бота
 def setup(bot):
     bot.add_cog(FunCommands(bot))
-    print(f"Подключение модуля FunCommands...")

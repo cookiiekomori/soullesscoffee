@@ -30,12 +30,6 @@ async def on_ready():
     print(f"-------------------------\nУспешно запущен бот, {bot.user.name}")
     bot.loop.create_task(status_task(bot))
 
-async def get_member_count():
-    guild = bot.get_guild(907577663810576405)  # Замените на ваш ID сервера
-    if guild:
-        return guild.member_count
-    return 0
-
 @bot.event
 async def on_command(ctx):
     print(f"Команда '{ctx.command}' была вызвана пользователем {ctx.author} в канале {ctx.channel}.")
@@ -45,20 +39,23 @@ async def on_command_error(ctx, error):
     print(f"Ошибка при выполнении команды '{ctx.command}': {error}")
 
 async def status_task(bot):
-    statuses = [
-        f"{len(bot.users)} users on {len(bot.guilds)} guilds",
-        "куки",
-        f"use {settings['prefix']}help for help"
-    ]
     while True:
-        for status in statuses:
-            try:
-                await bot.change_presence(activity=disnake.Streaming(type=1, url="https://www.twitch.tv/videos/225796573?t=00h00m30s", name=status))
-            except ClientConnectionResetError:
-                print("Connection reset, attempting to reconnect...")
-                await asyncio.sleep(5)  # Подождите перед повторной попыткой
-                break  # Выйдите из текущего цикла for и начните заново
+        # Статус "стримит" с разными названиями
+        try:
+            await bot.change_presence(activity=disnake.Streaming(name="куки", url="https://www.twitch.tv/videos/225796573?t=00h00m30s"))
             await asyncio.sleep(15)
+
+            await bot.change_presence(activity=disnake.Streaming(name=f"use {settings['prefix']}help for help", url="https://www.twitch.tv/videos/225796573?t=00h00m30s"))
+            await asyncio.sleep(15)
+
+            guilds = bot.guilds
+            total_members = sum(guild.member_count for guild in guilds)
+            await bot.change_presence(activity=disnake.Streaming(name=f"{total_members} users on {len(guilds)} guilds", url="https://www.twitch.tv/videos/225796573?t=00h00m30s"))
+            await asyncio.sleep(15)
+
+        except disnake.HTTPException as e:
+            print(f"Ошибка при изменении статуса 'стримит': {e}")
+            await asyncio.sleep(5)
 
 # Загрузка модулей
 for filename in os.listdir("cogs"):
@@ -91,6 +88,7 @@ async def load(inter: disnake.CommandInteraction,
     try:
         bot.load_extension(f"cogs.{module}")
         await inter.response.send_message(f"Загружен модуль `{module}`", ephemeral=True)
+        print(f"Загружен модуль {module}")
     except Exception as e:
         await inter.response.send_message(f"Ошибка при загрузке модуля `{module}`: {e}", ephemeral=True)
 
@@ -103,6 +101,7 @@ async def unload(inter: disnake.CommandInteraction,
     try:
         bot.unload_extension(f"cogs.{module}")
         await inter.response.send_message(f"Выгружен модуль `{module}`", ephemeral=True)
+        print(f"Выгружен модуль {module}")
     except Exception as e:
         await inter.response.send_message(f"Ошибка при выгрузке модуля `{module}`: {e}", ephemeral=True)
 
@@ -115,6 +114,7 @@ async def reload(inter: disnake.CommandInteraction,
     try:
         bot.reload_extension(f"cogs.{module}")
         await inter.response.send_message(f"Перезагружен модуль `{module}`", ephemeral=True)
+        print(f"Перезагружен модуль {module}")
     except Exception as e:
         await inter.response.send_message(f"Ошибка при перезагрузке модуля `{module}`: {e}", ephemeral=True)
 
