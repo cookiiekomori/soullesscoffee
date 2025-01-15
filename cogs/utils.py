@@ -2,11 +2,15 @@ from imports import *
 
 def load_config():
     with open('config.json', 'r', encoding='utf-8') as f:
-        return json.load(f)
+        config = json.load(f)
+        print("Конфигурация загружена:", config)  # Отладочное сообщение
+        return config
 
 def save_config(config):
     with open('config.json', 'w', encoding='utf-8') as f:
         json.dump(config, f, ensure_ascii=False, indent=4)
+    print("Конфигурация сохранена:", config)  # Отладочное сообщение
+
 
 settings = load_config()
 
@@ -43,6 +47,7 @@ class Utilites(commands.Cog):
 
         config['version'] = f"{major}.{minor}.{patch}"
         
+        # Сохраняем изменения в конфигурации после обновления версии
         save_config(config)
 
         await interaction.response.send_message(f"Версия обновлена до: {config['version']}")
@@ -55,9 +60,14 @@ class Utilites(commands.Cog):
         settings['restart_channel_id'] = interaction.channel.id
         save_config(settings)  # Сохраняем изменения в конфигурации
 
+        # Сохраняем текущую конфигурацию перед перезагрузкой
+        config = load_config()  # Загружаем текущую конфигурацию
+        print("Текущая версия перед перезагрузкой:", config['version'])  # Отладочное сообщение
+
         await interaction.response.send_message("Перезагрузка бота...")
         os.execv(sys.executable, ['python'] + sys.argv)
-        
+
+
 # Отправка обновления на ГитХаб ---------------------------------------------------------------------------------------------
     @update.sub_command(name='commit', description='Залить обновление на GitHub')
     async def commit(self, ctx):
@@ -68,6 +78,7 @@ class Utilites(commands.Cog):
         patch += 1 
         config['version'] = f"{major}.{minor}.{patch}"
         
+        # Сохраняем изменения в конфигурации после обновления версии
         save_config(config)
 
         try:
