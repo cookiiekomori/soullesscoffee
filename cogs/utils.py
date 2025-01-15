@@ -18,6 +18,11 @@ class Utilites(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"Модуль {self.__class__.__name__} подключен.")
+        # Проверяем, есть ли ID канала для сообщения о перезагрузке
+        if 'restart_channel_id' in settings:
+            channel = self.bot.get_channel(settings['restart_channel_id'])
+            if channel:
+                await channel.send("Бот успешно перезагружен!")
 
     @commands.slash_command(description="Команда для обновления версии бота")
     @commands.is_owner()
@@ -27,6 +32,7 @@ class Utilites(commands.Cog):
     def get_cogs(self):
         return [filename[:-3] for filename in os.listdir("cogs") if filename.endswith(".py")]
 
+# Обновление мажорной версии -----------------------------------------------------------------------------------------------
     @update.sub_command(description="Увеличить мажорную версию на 1")
     async def congratulation(self, interaction: disnake.ApplicationCommandInteraction):
         config = load_config()
@@ -40,12 +46,16 @@ class Utilites(commands.Cog):
 
         await interaction.response.send_message(f"Версия обновлена до: {config['version']}")
 
+# Рестарт бота -------------------------------------------------------------------------------------------------------------
     @update.sub_command(name='restart', description='Перезагрузить бота')
     async def restart(self, interaction: disnake.ApplicationCommandInteraction):
+        # Сохраняем ID канала, в который будет отправлено сообщение о перезагрузке
+        settings['restart_channel_id'] = interaction.channel.id
+        save_config(settings)  # Сохраняем изменения в конфигурации
+
         await interaction.response.send_message("Перезагрузка бота...")
         os.execv(sys.executable, ['python'] + sys.argv)
-
-
+# Отправка обновления на ГитХаб ---------------------------------------------------------------------------------------------
     @update.sub_command(name='commit', description='Залить обновление на GitHub')
     async def commit(self, ctx):
         await ctx.send("Начинаю обновление...")
@@ -67,7 +77,7 @@ class Utilites(commands.Cog):
         except subprocess.CalledProcessError as e:
             await ctx.send(f"Произошла ошибка при обновлении: {e}")
 
-
+# Purge command ----------------------------------------------------------------------------------------------------------------
     def is_owner_or_cooldown():
         def predicate(interaction: disnake.CommandInteraction):
             command = interaction.data['name']
@@ -89,24 +99,21 @@ class Utilites(commands.Cog):
                 return
 
         deleted = await interaction.channel.purge(limit=amount)
-        await interaction.response.send_message(f"Удалено {len(deleted)} сообщений.", ephemeral=True)  # Скрытое сообщение
+        await interaction.response.send_message(f"Удалено {len(deleted)} сообщений.", ephemeral=True)
 
-        # Логирование команды purge
         embed = disnake.Embed(
             title=f"Использование команды: `/purge`",
             color=disnake.Color.red()
         )
-        embed.add_field(name="Пользователь", value=interaction.author.mention, inline=True)  # Упоминание пользователя
-        embed.add_field(name="Канал", value=interaction.channel.mention, inline=True)  # Упоминание канала
-        embed.add_field(name="Количество удаленных сообщений", value=len(deleted), inline=False)  # Количество удаленных сообщений
-        embed.set_image(url="https://i.imgur.com/Y0MGCWI.png")  # Добавляем изображение
+        embed.add_field(name="Пользователь", value=interaction.author.mention, inline=True)
+        embed.add_field(name="Канал", value=interaction.channel.mention, inline=True)
+        embed.add_field(name="Количество удаленных сообщений", value=len(deleted), inline=False)
+        embed.set_image(url="https://i.imgur.com/Y0MGCWI.png")
 
-        print("Отправка вебхука...")  # Отладочное сообщение
         await self.send_webhook(settings['webhook_url']['command_log'], embed)
 
     @purge.error
     async def purge_error(self, interaction: disnake.CommandInteraction, error):
-        print(f"Ошибка в команде purge: {error}")  # Отладочное сообщение
         if isinstance(error, commands.CommandOnCooldown):
             await interaction.response.send_message(f"Вы можете использовать эту команду снова через {error.retry_after:.2f} секунд.", ephemeral=True)
 
@@ -121,7 +128,7 @@ class Utilites(commands.Cog):
                     await webhook.send(content)
         except Exception as e:
             print(f"Ошибка при отправке вебхука: {e}")
-
+# --------------------------------------------------------------------------------------------------------------------------------------
 
 
 def setup(bot):
