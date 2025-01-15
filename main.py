@@ -1,12 +1,4 @@
-import disnake
-import os
-import asyncio
-from disnake.ext import commands, tasks
-import json
-import aiohttp
-import nacl
-import sys
-import subprocess
+from imports import *
 
 # Загрузка конфигурации
 def load_config():
@@ -200,27 +192,6 @@ async def send_webhook(webhook_url, embed=None, content=None):
             await webhook.send(content)
 
 
-@bot.slash_command(name='restart', description='Перезагрузить бота')
-@commands.is_owner()
-async def restart(interaction: disnake.ApplicationCommandInteraction):
-    await interaction.response.send_message("Перезагрузка бота...")
-    os.execv(sys.executable, ['python'] + sys.argv)
 
-
-@bot.command()
-@commands.is_owner()
-async def update(ctx):
-    await ctx.send("Начинаю обновление...")
-
-    try:
-        os.chdir('C:\\Users\\cooki\\Desktop\\Homework\\soullesscoffee')
-
-        subprocess.run(['git', 'add', '.'], check=True)
-        subprocess.run(['git', 'commit', '-m', 'Обновление бота'], check=True)
-        subprocess.run(['git', 'push', 'origin', 'main'], check=True)
-
-        await ctx.send("Обновление завершено успешно!")
-    except subprocess.CalledProcessError as e:
-        await ctx.send(f"Произошла ошибка при обновлении: {e}")
 
 bot.run(settings['token'])

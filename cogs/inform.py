@@ -1,8 +1,4 @@
-import disnake
-from disnake.ext import commands
-import json
-import sys
-import os
+from imports import *
 
 def load_config():
     with open('config.json', 'r', encoding='utf-8') as f:
@@ -22,11 +18,6 @@ class Information(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"Модуль {self.__class__.__name__} подключен.")
-
-    @commands.slash_command(description="Команда для обновления версии бота")
-    @commands.is_owner()
-    async def update(self, interaction: disnake.ApplicationCommandInteraction):
-        pass
 
     @commands.slash_command(description="Информационные команды")
     async def info(self, interaction: disnake.ApplicationCommandInteraction):
@@ -77,32 +68,6 @@ class Information(commands.Cog):
         
         await interaction.send(embed=embed)
 
-    def get_cogs(self):
-        return [filename[:-3] for filename in os.listdir("cogs") if filename.endswith(".py")]
-
-    @update.sub_command(description="Увеличить патч-версию на 1")
-    async def commit(self, interaction: disnake.ApplicationCommandInteraction):
-        config = load_config()
-        major, minor, patch = map(int, config['version'].split('.'))
-        minor = len(self.get_cogs())  # Обновляем минорную версию на количество когов
-        patch += 1  # Увеличиваем патч-версию на 1
-        config['version'] = f"{major}.{minor}.{patch}"
-        save_config(config)
-
-        await interaction.response.send_message(f"Версия обновлена до: {config['version']}")
-
-    @update.sub_command(description="Увеличить мажорную версию на 1")
-    async def congratulation(self, interaction: disnake.ApplicationCommandInteraction):
-        config = load_config()
-        major, minor, patch = map(int, config['version'].split('.'))
-        major += 1  # Увеличиваем мажорную версию на 1
-        minor = len(self.get_cogs())  # Обновляем минорную версию на количество когов
-        patch = 0  # Сбрасываем патч-версию
-
-        config['version'] = f"{major}.{minor}.{patch}"
-        save_config(config)
-
-        await interaction.response.send_message(f"Версия обновлена до: {config['version']}")
 
 def setup(bot):
     bot.add_cog(Information(bot))

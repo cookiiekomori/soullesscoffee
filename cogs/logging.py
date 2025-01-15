@@ -1,7 +1,4 @@
-import disnake
-from disnake.ext import commands
-import json
-import aiohttp
+from imports import *
 
 # Функция для загрузки конфигурации
 def load_config():
