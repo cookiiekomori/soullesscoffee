@@ -1,9 +1,12 @@
 import disnake
 import os
 import asyncio
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 import json
 import aiohttp
+import nacl
+import sys
+import subprocess
 
 # Загрузка конфигурации
 def load_config():
@@ -21,15 +24,39 @@ settings = load_config()  # Здесь вы загружаете данные и
 # Создание бота
 intents = disnake.Intents().all()
 intents.message_content = True
+intents.voice_states = True  # Включаем интенты для работы с голосовыми состояниями
+intents.guilds = True  # Включаем интенты для работы с серверами
 bot = commands.Bot(command_prefix=settings['prefix'], intents=intents)
 
 print("Идет процесс запуска, ожидайте...")
+
+@tasks.loop(seconds=15)
+async def update_voice_channel_name():
+    total_members = 0
+
+    # Проходим по всем голосовым каналам на всех серверах
+    for guild in bot.guilds:
+        for channel in guild.voice_channels:
+            total_members += len(channel.members)
+
+    # Получаем целевой голосовой канал по ID
+    target_voice_channel = bot.get_channel(settings['TARGET_VOICE_CHANNEL_ID'])
+    if target_voice_channel:
+        new_name = f'🍥 » В войсе {total_members}'
+        
+        # Обработка ошибок при редактировании канала
+        try:
+            await target_voice_channel.edit(name=new_name)
+        except disnake.errors.DiscordServerError as e:
+            print(f"Ошибка при редактировании канала: {e}. Повторная попытка через 5 секунд.")
+            await asyncio.sleep(60)  # Ждем 5 секунд перед повторной попыткой
+            await update_voice_channel_name()  # Повторяем попытку
 
 @bot.event
 async def on_ready():
     print(f"-------------------------\nУспешно запущен бот, {bot.user.name}")
     bot.loop.create_task(status_task(bot))
-
+    update_voice_channel_name.start() 
 @bot.event
 async def on_command(ctx):
     print(f"Команда '{ctx.command}' была вызвана пользователем {ctx.author} в канале {ctx.channel}.")
@@ -40,7 +67,6 @@ async def on_command_error(ctx, error):
 
 async def status_task(bot):
     while True:
-        # Статус "стримит" с разными названиями
         try:
             await bot.change_presence(activity=disnake.Streaming(name="куки", url="https://www.twitch.tv/videos/225796573?t=00h00m30s"))
             await asyncio.sleep(15)
@@ -56,6 +82,7 @@ async def status_task(bot):
         except disnake.HTTPException as e:
             print(f"Ошибка при изменении статуса 'стримит': {e}")
             await asyncio.sleep(5)
+
 
 # Загрузка модулей
 for filename in os.listdir("cogs"):
@@ -172,5 +199,29 @@ async def send_webhook(webhook_url, embed=None, content=None):
         elif content:
             await webhook.send(content)
 
-# Запуск бота
+
+@bot.slash_command(name='restart', description='Перезагрузить бота')
+@commands.is_owner()
+async def restart(interaction: disnake.ApplicationCommandInteraction):
+    await interaction.response.send_message("Перезагрузка бота...")
+    os.execv(sys.executable, ['python'] + sys.argv)
+
+
+@bot.command()
+@commands.is_owner()
+async def update(ctx):
+    await ctx.send("Начинаю обновление...")
+
+    try:
+        os.chdir('C:\\Users\\cooki\\Desktop\\Homework\\soullesscoffee')
+
+        # Выполнить команды Git
+        subprocess.run(['git', 'add', '.'], check=True)
+        subprocess.run(['git', 'commit', '-m', 'Обновление бота'], check=True)
+        subprocess.run(['git', 'push', 'origin', 'main'], check=True)
+
+        await ctx.send("Обновление завершено успешно!")
+    except subprocess.CalledProcessError as e:
+        await ctx.send(f"Произошла ошибка при обновлении: {e}")
+
 bot.run(settings['token'])

@@ -58,7 +58,7 @@ class Logging(commands.Cog):
         embed.add_field(name="Пользователь", value=message.author.mention, inline=True)  # Установлено inline=True
         embed.add_field(name="Канал", value=message.channel.mention, inline=True)  # Установлено inline=True
         embed.set_image(url="https://i.imgur.com/jgPL7N5.png")  # Добавляем изображение
-        await self.send_webhook("message_delete_log", embed)
+        await self.send_webhook("message_log", embed)
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
@@ -72,16 +72,20 @@ class Logging(commands.Cog):
         embed.add_field(name="Пользователь", value=before.author.mention, inline=True)  # Установлено inline=True
         embed.add_field(name="Канал", value=before.channel.mention, inline=True)  # Установлено inline=True
         embed.set_image(url="https://i.imgur.com/jgPL7N5.png")  # Добавляем изображение
-        await self.send_webhook("message_edit_log", embed)
-# ------------------------------------------------------------------------------------------------------------------------------
+        await self.send_webhook("message_log", embed)
+
+# Логи входа и выхода с сервера -------------------------------------------------------------------------------------------------
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        print(f"{member.name} присоединился к серверу.")  # Отладочное сообщение
         embed = disnake.Embed(
             title="Пользователь присоединился к серверу",
             color=disnake.Color.green()
         )
-        embed.add_field(name="Пользователь", value=member.mention, inline=False)
-        await self.send_webhook("member_join_log", embed)
+        embed.add_field(name="Пользователь", value=member.mention, inline=True)
+        embed.add_field(name="Сервер", value=member.guild.name, inline=True)
+        embed.set_image(url="https://i.imgur.com/QlXrR4R.png")
+        await self.send_webhook("member_join_remove_log", embed)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
@@ -89,8 +93,10 @@ class Logging(commands.Cog):
             title="Пользователь покинул сервер",
             color=disnake.Color.red()
         )
-        embed.add_field(name="Пользователь", value=member.mention, inline=False)
-        await self.send_webhook("member_remove_log", embed)
+        embed.add_field(name="Пользователь", value=member.mention, inline=True)
+        embed.add_field(name="Сервер", value=member.guild.name, inline=True)
+        embed.set_image(url="https://i.imgur.com/QlXrR4R.png")  # Добавляем изображение
+        await self.send_webhook("member_join_remove_log", embed)
 
 # ------------------------------------------------------------------------------------------------------------------------------
     @commands.Cog.listener()
@@ -103,7 +109,7 @@ class Logging(commands.Cog):
             embed.add_field(name="Пользователь", value=member.mention, inline=True)  # Установлено inline=True
             embed.add_field(name="Канал", value=after.channel.mention, inline=True)  # Установлено inline=True
             embed.set_image(url="https://i.imgur.com/KUFiZYZ.png")  # Добавляем изображение
-            await self.send_webhook("voice_join_log", embed)
+            await self.send_webhook("voice_join_leave_log", embed)
         elif before.channel is not None and after.channel is None:
             embed = disnake.Embed(
                 title="Пользователь вышел из голосового канала",
@@ -112,7 +118,7 @@ class Logging(commands.Cog):
             embed.add_field(name="Пользователь", value=member.mention, inline=True)  # Установлено inline=True
             embed.add_field(name="Канал", value=before.channel.mention, inline=True)  # Установлено inline=True
             embed.set_image(url="https://i.imgur.com/KUFiZYZ.png")  # Добавляем изображение
-            await self.send_webhook("voice_leave_log", embed)
+            await self.send_webhook("voice_join_leave_log", embed)
 
 # Логи редактирования ролей на сервере ------------------------------------------------------------------------------------------
     @commands.Cog.listener()
@@ -130,12 +136,26 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role):
+        if role.guild is None:
+            return  # Если гильдия не существует, выходим
+
         embed = disnake.Embed(
             title="Удаление роли",
             color=disnake.Color.red()
         )
-        audit_logs = await role.guild.audit_logs(limit=1, action=disnake.AuditLogAction.role_delete).flatten()
-        user = audit_logs[0].user if audit_logs else None
+
+        try:
+            audit_logs = await role.guild.audit_logs(limit=1, action=disnake.AuditLogAction.role_delete).flatten()
+            user = audit_logs[0].user if audit_logs else None
+        except disnake.NotFound:
+            return  # Игнорируем, если гильдия не найдена
+        except disnake.Forbidden:
+            user = None
+            print("Недостаточно прав для доступа к журналам аудита.")
+        except Exception as e:
+            user = None
+            print(f"Произошла ошибка при получении журналов аудита: {str(e)}")
+
         embed.add_field(name="Название", value=f"```{role.name}```", inline=True)  # Указание роли
         embed.add_field(name="Удалил", value=user.mention if user else "Неизвестный", inline=True)
         embed.set_image(url="https://i.imgur.com/c2XfdGl.png")  # Добавляем изображение
@@ -179,6 +199,9 @@ class Logging(commands.Cog):
 # Логи изменения ролей у пользователей -----------------------------------------------------------------------------------------------------
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
+        if after.guild is None:
+            return  # Если гильдия не существует, выходим
+
         added_roles = [role for role in after.roles if role not in before.roles]
         removed_roles = [role for role in before.roles if role not in after.roles]
 
@@ -187,26 +210,48 @@ class Logging(commands.Cog):
                 title="Добавление роли пользователю",
                 color=disnake.Color.green()
             )
-            audit_logs = await after.guild.audit_logs(limit=1, action=disnake.AuditLogAction.member_role_update).flatten()
-            executor = audit_logs[0].user if audit_logs else None
+            try:
+                audit_logs = await after.guild.audit_logs(limit=1, action=disnake.AuditLogAction.member_role_update).flatten()
+                executor = audit_logs[0].user if audit_logs else None
+            except disnake.NotFound:
+                executor = None
+                print("Гильдия не найдена.")
+            except disnake.Forbidden:
+                executor = None
+                print("Недостаточно прав для доступа к журналам аудита.")
+            except Exception as e:
+                executor = None
+                print(f"Произошла ошибка при получении журналов аудита: {str(e)}")
+
             embed.add_field(name="Название", value=f"```{role.name}```", inline=False) 
             embed.add_field(name="Кому добавили", value=after.mention, inline=True)  
             embed.add_field(name="Кто добавил", value=executor.mention if executor else "Неизвестный", inline=True) 
             embed.set_image(url="https://i.imgur.com/F3L6OGK.png")  # Добавляем изображение
-            await self.send_webhook("rolemem_change_log", embed)
+            await self.send_webhook("role_member_change_log", embed)
 
         for role in removed_roles:
             embed = disnake.Embed(
                 title="Удаление роли у пользователя",
                 color=disnake.Color.red()
             )
-            audit_logs = await after.guild.audit_logs(limit=1, action=disnake.AuditLogAction.member_role_update).flatten()
-            executor = audit_logs[0].user if audit_logs else None
+            try:
+                audit_logs = await after.guild.audit_logs(limit=1, action=disnake.AuditLogAction.member_role_update).flatten()
+                executor = audit_logs[0].user if audit_logs else None
+            except disnake.NotFound:
+                executor = None
+                print("Гильдия не найдена.")
+            except disnake.Forbidden:
+                executor = None
+                print("Недостаточно прав для доступа к журналам аудита.")
+            except Exception as e:
+                executor = None
+                print(f"Произошла ошибка при получении журналов аудита: {str(e)}")
+
             embed.add_field(name="Название", value=f"```{role.name}```", inline=False) 
             embed.add_field(name="У кого удалили", value=after.mention, inline=True) 
             embed.add_field(name="Кто удалил", value=executor.mention if executor else "Неизвестный", inline=True) 
             embed.set_image(url="https://i.imgur.com/F3L6OGK.png")
-            await self.send_webhook("rolemem_change_log", embed)
+            await self.send_webhook("role_member_change_log", embed)
 
 # Логи перемещения бота по серверам -------------------------------------------------------------------------------------------------
     @commands.Cog.listener()
@@ -217,7 +262,7 @@ class Logging(commands.Cog):
             color=disnake.Color.red()
         )
         embed.set_image(url="https://i.imgur.com/JyMUM2H.png")  # Добавляем изображение
-        await self.send_webhook("guild_log", embed)
+        await self.send_webhook("bot_guild_log", embed)
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
@@ -237,7 +282,7 @@ class Logging(commands.Cog):
             embed.add_field(name="Ошибка", value=f"Не удалось создать ссылку на сервер: {str(e)}", inline=True)
 
         embed.set_image(url="https://i.imgur.com/JyMUM2H.png")  # Добавляем изображение
-        await self.send_webhook("guild_log", embed)
+        await self.send_webhook("bot_guild_log", embed)
 
 # Логи редактирования каналов ----------------------------------------------------------------------------------------------------
     @commands.Cog.listener()
@@ -296,13 +341,28 @@ class Logging(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_update(self, before, after):
         embed = disnake.Embed(
-            title=f"Сервер '{before.name}' был изменен на '{after.name}'",
-            color=disnake.Color.orange()
+            title="Изменение сервера",
+            color=disnake.Color.blue()
         )
-        audit_logs = await before.audit_logs(limit=1, action=disnake.AuditLogAction.guild_update).flatten()
-        user = audit_logs[0].user if audit_logs else None
-        embed.add_field(name="Изменил", value=user.mention if user else "Неизвестный", inline=False)
-        await self.send_webhook("server_change_log", embed)
+        embed.set_image(url="https://i.imgur.com/z5jCNod.png")  # Добавляем изображение
+
+        if before.name != after.name:
+            embed.add_field(name="Старое имя сервера", value=f"```{before.name}```", inline=True)
+            embed.add_field(name="Новое имя сервера", value=f"```{after.name}```", inline=True)
+
+        if before.icon != after.icon:
+            embed.description = "Иконка сервера была изменена."  # Устанавливаем описание
+
+        if before.preferred_locale != after.preferred_locale:
+            embed.add_field(name="Старая локализация", value=f"**{before.preferred_locale}**", inline=True)
+            embed.add_field(name="Новая локализация", value=f"**{after.preferred_locale}**", inline=True)
+
+        # Отправляем лог, только если есть изменения
+        if len(embed.fields) > 0 or embed.description:
+            await self.send_webhook("server_change_log", embed)
+
+
+
 
     # Логи редактирования эмодзи, стикеров ----------------------------------------------------------------------------------------
     @commands.Cog.listener()
@@ -316,7 +376,7 @@ class Logging(commands.Cog):
             audit_logs = await guild.audit_logs(limit=1, action=disnake.AuditLogAction.emoji_create).flatten()
             executor = audit_logs[0].user if audit_logs else None
             embed.add_field(name="Добавил", value=executor.mention if executor else "Неизвестный", inline=False)
-            await self.send_webhook("servermem_change_log", embed)
+            await self.send_webhook("server_emoji_change_log", embed)
 
         removed_emojis = [emoji for emoji in before if emoji not in after]
         for emoji in removed_emojis:
@@ -327,7 +387,7 @@ class Logging(commands.Cog):
             audit_logs = await guild.audit_logs(limit=1, action=disnake.AuditLogAction.emoji_delete).flatten()
             executor = audit_logs[0].user if audit_logs else None
             embed.add_field(name="Удалил", value=executor.mention if executor else "Неизвестный", inline=False)
-            await self.send_webhook("servermem_change_log", embed)
+            await self.send_webhook("server_emoji_change_log", embed)
 
     @commands.Cog.listener()
     async def on_sticker_create(self, sticker):
@@ -338,7 +398,7 @@ class Logging(commands.Cog):
         audit_logs = await sticker.guild.audit_logs(limit=1, action=disnake.AuditLogAction.sticker_create).flatten()
         executor = audit_logs[0].user if audit_logs else None
         embed.add_field(name="Добавил", value=executor.mention if executor else "Неизвестный", inline=False)
-        await self.send_webhook("servermem_change_log", embed)
+        await self.send_webhook("server_emoji_change_log", embed)
 
     @commands.Cog.listener()
     async def on_sticker_delete(self, sticker):
@@ -349,30 +409,60 @@ class Logging(commands.Cog):
         audit_logs = await sticker.guild.audit_logs(limit=1, action=disnake.AuditLogAction.sticker_delete).flatten()
         executor = audit_logs[0].user if audit_logs else None
         embed.add_field(name="Удалил", value=executor.mention if executor else "Неизвестный", inline=False)
-        await self.send_webhook("servermem_change_log", embed)
+        await self.send_webhook("server_emoji_change_log", embed)
 
     # Логи банов -----------------------------------------------------------------------------------------------------------------
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
+        if guild is None:
+            return  # Если гильдия не существует, выходим
+
         embed = disnake.Embed(
-            title=f"Пользователь '{user.name}' был забанен на сервере '{guild.name}'",
+            title="Пользователь забанен на сервере",
             color=disnake.Color.red()
         )
-        audit_logs = await guild.audit_logs(limit=1, action=disnake.AuditLogAction.ban).flatten()
-        executor = audit_logs[0].user if audit_logs else None
-        embed.add_field(name="Исполнитель", value=executor.mention if executor else "Неизвестный", inline=False)
-        await self.send_webhook("member_kek_log", embed)
+        embed.add_field(name="Пользователь", value=user.mention, inline=True)
+        embed.add_field(name="Сервер", value=guild.name, inline=True)
+
+        try:
+            audit_logs = await guild.audit_logs(limit=1, action=disnake.AuditLogAction.ban).flatten()
+            executor = audit_logs[0].user if audit_logs else None
+            embed.add_field(name="Исполнитель", value=executor.mention if executor else "Неизвестный", inline=True)
+        except disnake.Forbidden:
+            embed.add_field(name="Исполнитель", value="Неизвестный", inline=True)
+            print("Недостаточно прав для доступа к журналам аудита.")
+        except Exception as e:
+            embed.add_field(name="Исполнитель", value="Неизвестный", inline=True)
+            print(f"Произошла ошибка при получении журналов аудита: {str(e)}")
+
+        embed.set_image(url="https://i.imgur.com/cD1XEZ2.png")  # Добавляем изображение
+        await self.send_webhook("member_ban_log", embed)
 
     @commands.Cog.listener()
     async def on_member_unban(self, guild, user):
+        if guild is None:
+            return  # Если гильдия не существует, выходим
+
         embed = disnake.Embed(
-            title=f"Пользователь '{user.name}' был разбанен на сервере '{guild.name}'",
+            title="Пользователь разбанен на сервере",
             color=disnake.Color.green()
         )
-        audit_logs = await guild.audit_logs(limit=1, action=disnake.AuditLogAction.unban).flatten()
-        executor = audit_logs[0].user if audit_logs else None
-        embed.add_field(name="Исполнитель", value=executor.mention if executor else "Неизвестный", inline=False)
-        await self.send_webhook("member_kek_log", embed)
+        embed.add_field(name="Пользователь", value=user.mention, inline=True)
+        embed.add_field(name="Сервер", value=guild.name, inline=True)
+
+        try:
+            audit_logs = await guild.audit_logs(limit=1, action=disnake.AuditLogAction.unban).flatten()
+            executor = audit_logs[0].user if audit_logs else None
+            embed.add_field(name="Исполнитель", value=executor.mention if executor else "Неизвестный", inline=True)
+        except disnake.Forbidden:
+            embed.add_field(name="Исполнитель", value="Неизвестный", inline=True)
+            print("Недостаточно прав для доступа к журналам аудита.")
+        except Exception as e:
+            embed.add_field(name="Исполнитель", value="Неизвестный", inline=True)
+            print(f"Произошла ошибка при получении журналов аудита: {str(e)}")
+
+        embed.set_image(url="https://i.imgur.com/cD1XEZ2.png")  # Добавляем изображение
+        await self.send_webhook("member_ban_log", embed)
 
 def setup(bot):
     bot.add_cog(Logging(bot))
