@@ -42,9 +42,11 @@ class Utilites(commands.Cog):
         patch = 0 
 
         config['version'] = f"{major}.{minor}.{patch}"
+        
         save_config(config)
 
         await interaction.response.send_message(f"Версия обновлена до: {config['version']}")
+
 
 # Рестарт бота -------------------------------------------------------------------------------------------------------------
     @update.sub_command(name='restart', description='Перезагрузить бота')
@@ -55,6 +57,7 @@ class Utilites(commands.Cog):
 
         await interaction.response.send_message("Перезагрузка бота...")
         os.execv(sys.executable, ['python'] + sys.argv)
+        
 # Отправка обновления на ГитХаб ---------------------------------------------------------------------------------------------
     @update.sub_command(name='commit', description='Залить обновление на GitHub')
     async def commit(self, ctx):
@@ -64,6 +67,7 @@ class Utilites(commands.Cog):
         minor = len(self.get_cogs()) 
         patch += 1 
         config['version'] = f"{major}.{minor}.{patch}"
+        
         save_config(config)
 
         try:
