@@ -60,6 +60,14 @@ class Utilites(commands.Cog):
     @update.sub_command(name='commit', description='Залить обновление на GitHub')
     async def commit(self, ctx):
         await ctx.send("Начинаю обновление...")
+        config = load_config()
+        major, minor, patch = map(int, config['version'].split('.'))
+        major += 1 
+        minor = len(self.get_cogs())  
+        patch = 0 
+
+        config['version'] = f"{major}.{minor}.{patch}"
+        save_config(config)
 
         try:
             os.chdir('C:\\Users\\cooki\\Desktop\\Homework\\soullesscoffee')
@@ -69,6 +77,7 @@ class Utilites(commands.Cog):
             subprocess.run(['git', 'push', 'origin', 'main'], check=True)
 
             await ctx.send("Обновление завершено успешно!")
+            await ctx.send(f"Версия обновлена до: {config['version']}")
         except subprocess.CalledProcessError as e:
             await ctx.send(f"Произошла ошибка при обновлении: {e}")
 
