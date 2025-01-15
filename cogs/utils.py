@@ -60,7 +60,7 @@ class Utilites(commands.Cog):
             os.chdir('C:\\Users\\cooki\\Desktop\\Homework\\soullesscoffee')
 
             subprocess.run(['git', 'add', '.'], check=True)
-            subprocess.run(['git', 'commit', '-m', 'Обновление бота'], check=True)
+            subprocess.run(['git', 'commit', '-m', 'update'], check=True)
             subprocess.run(['git', 'push', 'origin', 'main'], check=True)
 
             await ctx.send(f"Обновление завершено успешно!\nВерсия обновлена до: {config['version']}")
