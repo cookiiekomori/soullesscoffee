@@ -27,24 +27,13 @@ class Utilites(commands.Cog):
     def get_cogs(self):
         return [filename[:-3] for filename in os.listdir("cogs") if filename.endswith(".py")]
 
-    @update.sub_command(description="Увеличить патч-версию на 1")
-    async def patch(self, interaction: disnake.ApplicationCommandInteraction):
-        config = load_config()
-        major, minor, patch = map(int, config['version'].split('.'))
-        minor = len(self.get_cogs())  # Обновляем минорную версию на количество когов
-        patch += 1  # Увеличиваем патч-версию на 1
-        config['version'] = f"{major}.{minor}.{patch}"
-        save_config(config)
-
-        await interaction.response.send_message(f"Версия обновлена до: {config['version']}")
-
     @update.sub_command(description="Увеличить мажорную версию на 1")
     async def congratulation(self, interaction: disnake.ApplicationCommandInteraction):
         config = load_config()
         major, minor, patch = map(int, config['version'].split('.'))
-        major += 1  # Увеличиваем мажорную версию на 1
-        minor = len(self.get_cogs())  # Обновляем минорную версию на количество когов
-        patch = 0  # Сбрасываем патч-версию
+        major += 1 
+        minor = len(self.get_cogs())
+        patch = 0 
 
         config['version'] = f"{major}.{minor}.{patch}"
         save_config(config)
@@ -62,10 +51,8 @@ class Utilites(commands.Cog):
         await ctx.send("Начинаю обновление...")
         config = load_config()
         major, minor, patch = map(int, config['version'].split('.'))
-        major += 1 
-        minor = len(self.get_cogs())  
-        patch = 0 
-
+        minor = len(self.get_cogs()) 
+        patch += 1 
         config['version'] = f"{major}.{minor}.{patch}"
         save_config(config)
 
@@ -76,8 +63,7 @@ class Utilites(commands.Cog):
             subprocess.run(['git', 'commit', '-m', 'Обновление бота'], check=True)
             subprocess.run(['git', 'push', 'origin', 'main'], check=True)
 
-            await ctx.send("Обновление завершено успешно!")
-            await ctx.send(f"Версия обновлена до: {config['version']}")
+            await ctx.send(f"Обновление завершено успешно!\nВерсия обновлена до: {config['version']}")
         except subprocess.CalledProcessError as e:
             await ctx.send(f"Произошла ошибка при обновлении: {e}")
 
