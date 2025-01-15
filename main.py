@@ -1,23 +1,20 @@
 from imports import *
 
-# Загрузка конфигурации
+
 def load_config():
     with open('config.json', 'r', encoding='utf-8') as f:
         return json.load(f)
 
-# Сохранение конфигурации
 def save_config(config):
     with open('config.json', 'w', encoding='utf-8') as f:
         json.dump(config, f, ensure_ascii=False, indent=4)
 
-# Загрузка конфигурации
-settings = load_config()  # Здесь вы загружаете данные из JSON в переменную settings
+settings = load_config()
 
-# Создание бота
 intents = disnake.Intents().all()
 intents.message_content = True
-intents.voice_states = True  # Включаем интенты для работы с голосовыми состояниями
-intents.guilds = True  # Включаем интенты для работы с серверами
+intents.voice_states = True
+intents.guilds = True 
 bot = commands.Bot(command_prefix=settings['prefix'], intents=intents)
 
 print("Идет процесс запуска, ожидайте...")
@@ -26,23 +23,20 @@ print("Идет процесс запуска, ожидайте...")
 async def update_voice_channel_name():
     total_members = 0
 
-    # Проходим по всем голосовым каналам на всех серверах
     for guild in bot.guilds:
         for channel in guild.voice_channels:
             total_members += len(channel.members)
 
-    # Получаем целевой голосовой канал по ID
     target_voice_channel = bot.get_channel(settings['TARGET_VOICE_CHANNEL_ID'])
     if target_voice_channel:
         new_name = f'🍥 » В войсе {total_members}'
-        
-        # Обработка ошибок при редактировании канала
+
         try:
             await target_voice_channel.edit(name=new_name)
         except disnake.errors.DiscordServerError as e:
             print(f"Ошибка при редактировании канала: {e}. Повторная попытка через 5 секунд.")
-            await asyncio.sleep(60)  # Ждем 5 секунд перед повторной попыткой
-            await update_voice_channel_name()  # Повторяем попытку
+            await asyncio.sleep(60) 
+            await update_voice_channel_name() 
 
 @bot.event
 async def on_ready():
@@ -76,122 +70,66 @@ async def status_task(bot):
             await asyncio.sleep(5)
 
 
-# Загрузка модулей
 for filename in os.listdir("cogs"):
     if filename.endswith(".py"):
         bot.load_extension("cogs." + filename[:-3])
 
-# Функция для получения списка когов
 def get_cogs():
     return [filename[:-3] for filename in os.listdir("cogs") if filename.endswith(".py")]
 
-# Статический список когов с дескрипшенами
-static_cogs = [
-    disnake.OptionChoice(name="ctx_commands", value="ctx_commands"),
-    disnake.OptionChoice(name="embed", value="embed"),
-    disnake.OptionChoice(name="logging", value="logging"),
-]  # Замените на ваши названия когов
 
-@bot.slash_command(description="Выводит список доступных модулей")
-@commands.is_owner()
-async def list_cogs(inter: disnake.CommandInteraction):
-    cog_list = "\n".join(get_cogs())
-    await inter.response.send_message(f"Список модулей:```\n{cog_list}\n```", ephemeral=True)
+class Cogs(str, Enum):
+    CtxCommands = 'ctx_commands'
+    Embed = 'embed'
+    FunCommands = 'fun_commands'
+    Inform = 'inform'
+    Logging = 'logging'
+    Utils = 'utils'
 
+# Загрузка модуля ------------------------------------------------------------------------------------------------------------
 @bot.slash_command(description="Загрузить модуль бота")
 @commands.is_owner()
 async def load(inter: disnake.CommandInteraction, 
-               module: str = disnake.Option(name="module", 
-                                            description="Выберите модуль для загрузки", 
-                                            choices=static_cogs)):
+                module: Cogs = disnake.Option(name="module", 
+                                               description="Выберите модуль для загрузки", 
+                                               choices=[cog for cog in Cogs])):
     try:
         bot.load_extension(f"cogs.{module}")
         await inter.response.send_message(f"Загружен модуль `{module}`", ephemeral=True)
         print(f"Загружен модуль {module}")
+        
     except Exception as e:
         await inter.response.send_message(f"Ошибка при загрузке модуля `{module}`: {e}", ephemeral=True)
 
+# Выгрузка модуля ------------------------------------------------------------------------------------------------------------
 @bot.slash_command(description="Выгрузить модуль бота")
 @commands.is_owner()
 async def unload(inter: disnake.CommandInteraction, 
-                 module: str = disnake.Option(name="module", 
-                                              description="Выберите модуль для выгрузки", 
-                                              choices=static_cogs)):
+                  module: Cogs = disnake.Option(name="module", 
+                                                 description="Выберите модуль для выгрузки", 
+                                                 choices=[cog for cog in Cogs])):
     try:
         bot.unload_extension(f"cogs.{module}")
         await inter.response.send_message(f"Выгружен модуль `{module}`", ephemeral=True)
         print(f"Выгружен модуль {module}")
+        
     except Exception as e:
         await inter.response.send_message(f"Ошибка при выгрузке модуля `{module}`: {e}", ephemeral=True)
 
+# Перезагрузка модуля ------------------------------------------------------------------------------------------------------------
 @bot.slash_command(description="Перезагрузить модуль бота")
 @commands.is_owner()
 async def reload(inter: disnake.CommandInteraction, 
-                  module: str = disnake.Option(name="module", 
-                                               description="Выберите модуль для перезагрузки", 
-                                               choices=static_cogs)):
+                  module: Cogs = disnake.Option(name="module", 
+                                                 description="Выберите модуль для перезагрузки", 
+                                                 choices=[cog for cog in Cogs])):
     try:
         bot.reload_extension(f"cogs.{module}")
         await inter.response.send_message(f"Перезагружен модуль `{module}`", ephemeral=True)
         print(f"Перезагружен модуль {module}")
+        
     except Exception as e:
         await inter.response.send_message(f"Ошибка при перезагрузке модуля `{module}`: {e}", ephemeral=True)
-
-
-
-
-def is_owner_or_cooldown():
-    def predicate(ctx):
-        return ctx.author.id == ctx.bot.owner_id or not ctx.command.is_on_cooldown(ctx)
-    return commands.check(predicate)
-
-@bot.slash_command(description="Очищает указанное количество сообщений из канала.")
-@commands.has_permissions(manage_messages=True)  # Проверка на наличие разрешения
-@is_owner_or_cooldown()  # Проверка на владельца или отсутствие кулдауна
-async def purge(inter: disnake.CommandInteraction, amount: int = None):
-    if amount is None:
-        await inter.response.send_message("Пожалуйста, укажите количество сообщений для удаления.", ephemeral=True)
-        return
-
-    # Снятие ограничения на количество удаляемых сообщений для владельца
-    if inter.author.id != inter.bot.owner_id:
-        if amount < 1 or amount > 20:
-            await inter.response.send_message("Количество сообщений должно быть от 1 до 20.", ephemeral=True)
-            return
-
-    deleted = await inter.channel.purge(limit=amount)
-    await inter.response.send_message(f"Удалено {len(deleted)} сообщений.", ephemeral=True)  # Скрытое сообщение
-
-    # Логирование использования команды в вебхук с эмбед
-    log_message = (
-        f"Команда 'purge' использована пользователем **{inter.author.name}**\n\n"
-        f"Канал: **{inter.channel.mention}** (ID: {inter.channel.id})\n\n"
-        f"Сервер: **{inter.guild.name}** (ID: {inter.guild.id})\n"
-    )
-    
-    embed = disnake.Embed(
-        title="Лог команды 'purge'",
-        description=log_message,
-        color=disnake.Color.red()  # Вы можете выбрать любой цвет
-    )
-    embed.set_footer(text=f"Удалено сообщений: {len(deleted)}")  # Добавляем количество удаленных сообщений в footer
-    await send_webhook(settings['webhook_url']['command_log'], embed)
-
-# Установка кулдауна для команды
-@purge.error
-async def purge_error(inter: disnake.CommandInteraction, error):
-    if isinstance(error, commands.CommandOnCooldown):
-        await inter.response.send_message(f"Вы можете использовать эту команду снова через {error.retry_after:.2f} секунд.", ephemeral=True)
-
-async def send_webhook(webhook_url, embed=None, content=None):
-    async with aiohttp.ClientSession() as session:
-        webhook = disnake.Webhook.from_url(webhook_url, session=session)
-        if embed:
-            await webhook.send(embed=embed)
-        elif content:
-            await webhook.send(content)
-
-
 
 
 bot.run(settings['token'])

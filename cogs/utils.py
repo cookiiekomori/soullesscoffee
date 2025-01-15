@@ -67,5 +67,62 @@ class Utilites(commands.Cog):
         except subprocess.CalledProcessError as e:
             await ctx.send(f"Произошла ошибка при обновлении: {e}")
 
+
+    def is_owner_or_cooldown():
+        def predicate(interaction: disnake.CommandInteraction):
+            command = interaction.data['name']
+            cmd = interaction.bot.get_slash_command(command)
+            return interaction.author.id == interaction.bot.owner_id or not cmd.is_on_cooldown(interaction)
+        return commands.check(predicate)
+
+    @commands.slash_command(description="Очищает указанное количество сообщений из канала.")
+    @commands.has_permissions(manage_messages=True)
+    @is_owner_or_cooldown()
+    async def purge(self, interaction: disnake.CommandInteraction, amount: int = None):
+        if amount is None:
+            await interaction.response.send_message("Пожалуйста, укажите количество сообщений для удаления.", ephemeral=True)
+            return
+
+        if interaction.author.id != interaction.bot.owner_id:
+            if amount < 1 or amount > 20:
+                await interaction.response.send_message("Количество сообщений должно быть от 1 до 20.", ephemeral=True)
+                return
+
+        deleted = await interaction.channel.purge(limit=amount)
+        await interaction.response.send_message(f"Удалено {len(deleted)} сообщений.", ephemeral=True)  # Скрытое сообщение
+
+        # Логирование команды purge
+        embed = disnake.Embed(
+            title=f"Использование команды: `/purge`",
+            color=disnake.Color.red()
+        )
+        embed.add_field(name="Пользователь", value=interaction.author.mention, inline=True)  # Упоминание пользователя
+        embed.add_field(name="Канал", value=interaction.channel.mention, inline=True)  # Упоминание канала
+        embed.add_field(name="Количество удаленных сообщений", value=len(deleted), inline=False)  # Количество удаленных сообщений
+        embed.set_image(url="https://i.imgur.com/Y0MGCWI.png")  # Добавляем изображение
+
+        print("Отправка вебхука...")  # Отладочное сообщение
+        await self.send_webhook(settings['webhook_url']['command_log'], embed)
+
+    @purge.error
+    async def purge_error(self, interaction: disnake.CommandInteraction, error):
+        print(f"Ошибка в команде purge: {error}")  # Отладочное сообщение
+        if isinstance(error, commands.CommandOnCooldown):
+            await interaction.response.send_message(f"Вы можете использовать эту команду снова через {error.retry_after:.2f} секунд.", ephemeral=True)
+
+
+    async def send_webhook(self, webhook_url, embed=None, content=None):
+        try:
+            async with aiohttp.ClientSession() as session:
+                webhook = disnake.Webhook.from_url(webhook_url, session=session)
+                if embed:
+                    await webhook.send(embed=embed)
+                elif content:
+                    await webhook.send(content)
+        except Exception as e:
+            print(f"Ошибка при отправке вебхука: {e}")
+
+
+
 def setup(bot):
     bot.add_cog(Utilites(bot))
