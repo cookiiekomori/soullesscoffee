@@ -2,15 +2,11 @@ from imports import *
 
 def load_config():
     with open('config.json', 'r', encoding='utf-8') as f:
-        config = json.load(f)
-        print("Конфигурация загружена:", config)  # Отладочное сообщение
-        return config
+        return json.load(f)
 
 def save_config(config):
     with open('config.json', 'w', encoding='utf-8') as f:
         json.dump(config, f, ensure_ascii=False, indent=4)
-    print("Конфигурация сохранена:", config)  # Отладочное сообщение
-
 
 settings = load_config()
 
@@ -22,11 +18,6 @@ class Utilites(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"Модуль {self.__class__.__name__} подключен.")
-        # Проверяем, есть ли ID канала для сообщения о перезагрузке
-        if 'restart_channel_id' in settings:
-            channel = self.bot.get_channel(settings['restart_channel_id'])
-            if channel:
-                await channel.send("Бот успешно перезагружен!")
 
     @commands.slash_command(description="Команда для обновления версии бота")
     @commands.is_owner()
@@ -46,27 +37,15 @@ class Utilites(commands.Cog):
         patch = 0 
 
         config['version'] = f"{major}.{minor}.{patch}"
-        
-        # Сохраняем изменения в конфигурации после обновления версии
         save_config(config)
 
         await interaction.response.send_message(f"Версия обновлена до: {config['version']}")
 
-
 # Рестарт бота -------------------------------------------------------------------------------------------------------------
     @update.sub_command(name='restart', description='Перезагрузить бота')
     async def restart(self, interaction: disnake.ApplicationCommandInteraction):
-        # Сохраняем ID канала, в который будет отправлено сообщение о перезагрузке
-        settings['restart_channel_id'] = interaction.channel.id
-        save_config(settings)  # Сохраняем изменения в конфигурации
-
-        # Сохраняем текущую конфигурацию перед перезагрузкой
-        config = load_config()  # Загружаем текущую конфигурацию
-        print("Текущая версия перед перезагрузкой:", config['version'])  # Отладочное сообщение
-
-        await interaction.response.send_message("Перезагрузка бота...")
+        await interaction.response.send_message("Перезагрузка бота...", ephemeral=True)
         os.execv(sys.executable, ['python'] + sys.argv)
-
 
 # Отправка обновления на ГитХаб ---------------------------------------------------------------------------------------------
     @update.sub_command(name='commit', description='Залить обновление на GitHub')
@@ -77,8 +56,6 @@ class Utilites(commands.Cog):
         minor = len(self.get_cogs()) 
         patch += 1 
         config['version'] = f"{major}.{minor}.{patch}"
-        
-        # Сохраняем изменения в конфигурации после обновления версии
         save_config(config)
 
         try:
