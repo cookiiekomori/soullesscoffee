@@ -215,7 +215,6 @@ async def update(ctx):
     try:
         os.chdir('C:\\Users\\cooki\\Desktop\\Homework\\soullesscoffee')
 
-        # Выполнить команды Git
         subprocess.run(['git', 'add', '.'], check=True)
         subprocess.run(['git', 'commit', '-m', 'Обновление бота'], check=True)
         subprocess.run(['git', 'push', 'origin', 'main'], check=True)
