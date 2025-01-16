@@ -22,6 +22,15 @@ class Utilites(commands.Cog):
     @commands.slash_command(description="Команда для обновления версии бота")
     @commands.is_owner()
     async def update(self, interaction: disnake.ApplicationCommandInteraction):
+        embed = disnake.Embed(
+            title=f"Использование команды: `/fun`",
+            color=disnake.Color.red()
+        )
+        embed.add_field(name="Пользователь", value=interaction.author.mention, inline=True)
+        embed.add_field(name="Канал", value=interaction.channel.mention, inline=True)
+        embed.set_image(url="https://i.imgur.com/Y0MGCWI.png")
+
+        await self.send_webhook(settings['webhook_url']['command_log'], embed)
         pass
 
     def get_cogs(self):

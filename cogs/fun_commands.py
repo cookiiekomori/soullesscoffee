@@ -5,6 +5,9 @@ def load_config():
     with open('config.json', 'r', encoding='utf-8') as f:
         return json.load(f)
 
+settings = load_config()
+
+
 class FunCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -16,7 +19,16 @@ class FunCommands(commands.Cog):
 
     @commands.slash_command(description="Команды для развлечения.\n\nИмеет подкоманды")
     async def fun(self, interaction: disnake.ApplicationCommandInteraction):
-        pass  # Это будет родительская команда, которая ничего не делает
+        embed = disnake.Embed(
+            title=f"Использование команды: `/fun`",
+            color=disnake.Color.red()
+        )
+        embed.add_field(name="Пользователь", value=interaction.author.mention, inline=True)
+        embed.add_field(name="Канал", value=interaction.channel.mention, inline=True)
+        embed.set_image(url="https://i.imgur.com/Y0MGCWI.png")
+
+        await self.send_webhook(settings['webhook_url']['command_log'], embed)
+        pass  # Это будет родительская команда, которая ничего не делае
 
 # Шлеп --------------------------------------------------------------------------------------------------------------------------
     @fun.sub_command(description="Шлепнуть по попе")
@@ -502,6 +514,18 @@ class FunCommands(commands.Cog):
         embed.set_image(url=random_gif)
         embed.set_footer(text="у вас в голове только хиханьки да хаханьки")
         await interaction.send(embed=embed)
+
+
+    async def send_webhook(self, webhook_url, embed=None, content=None):
+        try:
+            async with aiohttp.ClientSession() as session:
+                webhook = disnake.Webhook.from_url(webhook_url, session=session)
+                if embed:
+                    await webhook.send(embed=embed)
+                elif content:
+                    await webhook.send(content)
+        except Exception as e:
+            print(f"Ошибка при отправке вебхука: {e}")
 
 def setup(bot):
     bot.add_cog(FunCommands(bot))
