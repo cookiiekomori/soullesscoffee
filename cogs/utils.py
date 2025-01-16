@@ -62,10 +62,14 @@ class Utilites(commands.Cog):
             await ctx.send(f"Обновление завершено успешно!\nВерсия обновлена до: {config['version']}")
 
             # Перезапуск бота
-            await self.restart(ctx)  # Вызов команды перезапуска
+            await restart_bot(ctx)
 
         except subprocess.CalledProcessError as e:
             await ctx.send(f"Произошла ошибка при обновлении: {e}")
+
+    async def restart_bot(ctx):
+        await ctx.send("Перезагрузка бота...")
+        os.execv(sys.executable, ['python'] + sys.argv)
 
     @update.sub_command(name='restart', description='Перезагрузить бота')
     async def restart(self, interaction: disnake.ApplicationCommandInteraction):
