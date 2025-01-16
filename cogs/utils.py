@@ -62,7 +62,7 @@ class Utilites(commands.Cog):
             await ctx.send(f"Обновление завершено успешно!\nВерсия обновлена до: {config['version']}")
 
             # Перезапуск бота
-            await self.restart(ctx)
+            await self.restart(ctx)  # Вызов команды перезапуска
 
         except subprocess.CalledProcessError as e:
             await ctx.send(f"Произошла ошибка при обновлении: {e}")
@@ -71,7 +71,6 @@ class Utilites(commands.Cog):
     async def restart(self, interaction: disnake.ApplicationCommandInteraction):
         await interaction.response.send_message("Перезагрузка бота...", ephemeral=True)
         os.execv(sys.executable, ['python'] + sys.argv)
-
 # Purge command ----------------------------------------------------------------------------------------------------------------
     def is_owner_or_cooldown():
         def predicate(interaction: disnake.CommandInteraction):
