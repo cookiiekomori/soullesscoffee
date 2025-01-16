@@ -23,7 +23,7 @@ class Utilites(commands.Cog):
     @commands.is_owner()
     async def update(self, interaction: disnake.ApplicationCommandInteraction):
         embed = disnake.Embed(
-            title=f"Использование команды: `/fun`",
+            title=f"Использование команды: `/update`",
             color=disnake.Color.red()
         )
         embed.add_field(name="Пользователь", value=interaction.author.mention, inline=True)
