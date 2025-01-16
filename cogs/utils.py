@@ -43,8 +43,8 @@ class Utilites(commands.Cog):
 
 # Рестарт бота -------------------------------------------------------------------------------------------------------------
     @update.sub_command(name='commit', description='Залить обновление на GitHub')
-    async def commit(self, ctx):
-        await ctx.send("Начинаю обновление...")
+    async def commit(self, interaction: disnake.ApplicationCommandInteraction):
+        await interaction.response.send_message("Начинаю обновление...")
         config = load_config()
         major, minor, patch = map(int, config['version'].split('.'))
         minor = len(self.get_cogs()) 
@@ -59,17 +59,13 @@ class Utilites(commands.Cog):
             subprocess.run(['git', 'commit', '-m', 'update'], check=True)
             subprocess.run(['git', 'push', 'origin', 'main'], check=True)
 
-            await ctx.send(f"Обновление завершено успешно!\nВерсия обновлена до: {config['version']}")
+            await interaction.followup.send(f"Обновление завершено успешно!\nВерсия обновлена до: {config['version']}")
 
             # Перезапуск бота
-            await restart_bot(ctx)
+            await self.restart(interaction)
 
         except subprocess.CalledProcessError as e:
-            await ctx.send(f"Произошла ошибка при обновлении: {e}")
-
-    async def restart_bot(ctx):
-        await ctx.send("Перезагрузка бота...")
-        os.execv(sys.executable, ['python'] + sys.argv)
+            await interaction.followup.send(f"Произошла ошибка при обновлении: {e}")
 
     @update.sub_command(name='restart', description='Перезагрузить бота')
     async def restart(self, interaction: disnake.ApplicationCommandInteraction):
