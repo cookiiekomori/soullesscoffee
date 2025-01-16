@@ -14,12 +14,12 @@ class FunCommands(commands.Cog):
     async def on_ready(self):
         print(f"Модуль {self.__class__.__name__} подключен.")
 
-    @commands.slash_command(description="Команды для развлечения")
+    @commands.slash_command(description="Команды для развлечения.\n\nИмеет подкоманды")
     async def fun(self, interaction: disnake.ApplicationCommandInteraction):
         pass  # Это будет родительская команда, которая ничего не делает
 
 # Шлеп --------------------------------------------------------------------------------------------------------------------------
-    @fun.sub_command(description="Ударить по попе")
+    @fun.sub_command(description="Шлепнуть по попе")
     async def slap(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         # Если пользователь не указан, используем автора команды
         if user is None:

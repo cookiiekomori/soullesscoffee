@@ -19,7 +19,35 @@ class Information(commands.Cog):
     async def on_ready(self):
         print(f"Модуль {self.__class__.__name__} подключен.")
 
-    @commands.slash_command(description="Информационные команды")
+# Список команд -----------------------------------------------------------------------------------------------------------------------
+    @commands.slash_command(description="Вывод списка команд")
+    async def help(self, interaction: disnake.ApplicationCommandInteraction):
+        owner_only_commands = [
+            'load', 
+            'reload', 
+            'unload', 
+            'restart', 
+            'update', 
+            'send_webhook_embed', 
+            'purge', 
+            'create_embed'
+        ]
+
+        embed = disnake.Embed(title="Список доступных команд", color=disnake.Color.from_rgb(43, 45, 49))
+
+        for cmd in self.bot.application_commands:
+            if cmd.name not in owner_only_commands:
+                description = cmd.description or 'Нет описания.'
+                embed.add_field(name=f"/{cmd.name}", value=f"```{description}```", inline=True)
+
+        if not embed.fields:
+            embed.add_field(name="Нет слэш-команд", value="Нет доступных слэш-команд.", inline=False)
+
+        await interaction.send(embed=embed)
+
+# Информационные команды -----------------------------------------------------------------------------------------------------------------------
+
+    @commands.slash_command(description="Информационные команды.\n\nИмеет подкоманды")
     async def info(self, interaction: disnake.ApplicationCommandInteraction):
         pass 
 
@@ -145,23 +173,9 @@ class Information(commands.Cog):
 
 
 
-# Список команд -----------------------------------------------------------------------------------------------------------------------
-    @info.sub_command(description="Список всех команд")
-    async def commands(self, interaction: disnake.ApplicationCommandInteraction):
 
-        owner_only_commands = ['load', 'reload', 'unload', 'restart', 'update', 'send_webhook_embed']  # Список команд, которые требуют прав владельца
 
-        command_names = [cmd.name for cmd in self.bot.commands if cmd.name not in owner_only_commands]
-        slash_command_names = [cmd.name for cmd in self.bot.application_commands if cmd.name not in owner_only_commands]
-        command_list = "\n".join(f"{settings['prefix']}{name}" for name in command_names) if command_names else "Нет обычных команд."
-        slash_command_list = "\n".join(f"/{name}" for name in slash_command_names) if slash_command_names else "Нет слэш-команд."
-        
-        # Используем цвет из HEX
-        embed = disnake.Embed(title="Список всех команд", color=disnake.Color.from_rgb(43, 45, 49))
-        embed.add_field(name="Префикс команды", value=f"```\n{command_list}```", inline=True)
-        embed.add_field(name="Слэш-команды", value=f"```\n{slash_command_list}```", inline=True)
-        
-        await interaction.send(embed=embed)
+
 
 
 def setup(bot):
