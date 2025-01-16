@@ -60,8 +60,6 @@ class Utilites(commands.Cog):
             subprocess.run(['git', 'push', 'origin', 'main'], check=True)
 
             await interaction.followup.send(f"Обновление завершено успешно!\nВерсия обновлена до: {config['version']}\nНачата перезагрузка бота, подождите 10 секунд до начала использования команд")
-
-            # Перезапуск бота
             await interaction.followup.send("Перезагрузка бота...", ephemeral=True)
             os.execv(sys.executable, ['python'] + sys.argv)
 
