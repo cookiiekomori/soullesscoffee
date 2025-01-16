@@ -59,8 +59,8 @@ class Utilites(commands.Cog):
             subprocess.run(['git', 'commit', '-m', 'update'], check=True)
             subprocess.run(['git', 'push', 'origin', 'main'], check=True)
 
-            await interaction.followup.send(f"Обновление завершено успешно!\nВерсия обновлена до: {config['version']}\nНачата перезагрузка бота, подождите 10 секунд до начала использования команд")
-            await interaction.followup.send("Перезагрузка бота...", ephemeral=True)
+            await interaction.followup.send(f"Обновление завершено успешно!\nВерсия обновлена до: {config['version']}")
+            await interaction.followup.send("Начата перезагрузка бота, подождите 10 секунд до начала использования команд")
             os.execv(sys.executable, ['python'] + sys.argv)
 
         except subprocess.CalledProcessError as e:
