@@ -28,7 +28,7 @@ class Embed(commands.Cog):
     @commands.slash_command(description="Создать эмбед из JSON")
     async def embed(self, inter: disnake.CommandInteraction, json_data: str):
         allowed_role_ids = [self.admin_role_id, self.developer_role_id]
-        if interaction.user.id != owner_id and not any(role.id in allowed_role_ids for role in interaction.user.roles):
+        if not any(role.id in allowed_role_ids for role in interaction.user.roles):
             await interaction.response.send_message("Недостаточно прав для использования этой команды.", ephemeral=True)
             return
         try:
@@ -117,8 +117,11 @@ class Embed(commands.Cog):
 
 
     @commands.slash_command(description="Отправить эмбед через вебхук")
-    @has_required_role()
     async def send_webhook_embed(self, inter: disnake.CommandInteraction, webhook_url: str, json_data: str):
+        allowed_role_ids = [self.admin_role_id, self.developer_role_id]
+        if not any(role.id in allowed_role_ids for role in interaction.user.roles):
+            await interaction.response.send_message("Недостаточно прав для использования этой команды.", ephemeral=True)
+            return
         try:
             # Парсим JSON-строку
             data = json.loads(json_data)
@@ -257,7 +260,7 @@ class Embed(commands.Cog):
     @commands.slash_command(description="Помощь с эмбедом")
     async def embed_help(self, interaction: disnake.ApplicationCommandInteraction):
         allowed_role_ids = [self.admin_role_id, self.developer_role_id]
-        if interaction.user.id != owner_id and not any(role.id in allowed_role_ids for role in interaction.user.roles):
+        if not any(role.id in allowed_role_ids for role in interaction.user.roles):
             await interaction.response.send_message("Недостаточно прав для использования этой команды.", ephemeral=True)
             return
 
@@ -269,7 +272,8 @@ class Embed(commands.Cog):
         embed.add_field(name="Имя юзера", value="```{member:ID}```", inline=True)
         embed.add_field(name="Аватарка юзера", value="```{member_avatar:ID}```", inline=True)
 
-        await interaction.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
+
 
 
 def setup(bot):

@@ -41,13 +41,7 @@ class Utilites(commands.Cog):
 
         await interaction.response.send_message(f"Версия обновлена до: {config['version']}")
 
-# Рестарт бота -------------------------------------------------------------------------------------------------------------
-    @update.sub_command(name='restart', description='Перезагрузить бота')
-    async def restart(self, interaction: disnake.ApplicationCommandInteraction):
-        await interaction.response.send_message("Перезагрузка бота...", ephemeral=True)
-        os.execv(sys.executable, ['python'] + sys.argv)
-
-# Отправка обновления на ГитХаб ---------------------------------------------------------------------------------------------
+    # Отправка обновления на ГитХаб ---------------------------------------------------------------------------------------------
     @update.sub_command(name='commit', description='Залить обновление на GitHub')
     async def commit(self, ctx):
         await ctx.send("Начинаю обновление...")
@@ -66,8 +60,18 @@ class Utilites(commands.Cog):
             subprocess.run(['git', 'push', 'origin', 'main'], check=True)
 
             await ctx.send(f"Обновление завершено успешно!\nВерсия обновлена до: {config['version']}")
+
+            # Перезагрузка бота после успешного коммита
+            await self.restart(ctx)
+
         except subprocess.CalledProcessError as e:
             await ctx.send(f"Произошла ошибка при обновлении: {e}")
+
+    # Рестарт бота -------------------------------------------------------------------------------------------------------------
+    @update.sub_command(name='restart', description='Перезагрузить бота')
+    async def restart(self, interaction: disnake.ApplicationCommandInteraction):
+        await interaction.response.send_message("Перезагрузка бота...", ephemeral=True)
+        os.execv(sys.executable, ['python'] + sys.argv)
 
 # Purge command ----------------------------------------------------------------------------------------------------------------
     def is_owner_or_cooldown():
