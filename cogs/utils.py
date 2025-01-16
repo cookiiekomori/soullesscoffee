@@ -62,7 +62,8 @@ class Utilites(commands.Cog):
             await interaction.followup.send(f"Обновление завершено успешно!\nВерсия обновлена до: {config['version']}")
 
             # Перезапуск бота
-            await self.restart(interaction)
+            await interaction.followup.send("Перезагрузка бота...")
+            os.execv(sys.executable, ['python'] + sys.argv)
 
         except subprocess.CalledProcessError as e:
             await interaction.followup.send(f"Произошла ошибка при обновлении: {e}")
