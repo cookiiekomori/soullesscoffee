@@ -44,11 +44,29 @@ class Information(commands.Cog):
             embed.add_field(name="Нет слэш-команд", value="Нет доступных слэш-команд.", inline=False)
 
         await interaction.send(embed=embed)
+        embed = disnake.Embed(
+            title=f"Использование команды: `/help`",
+            color=disnake.Color.red()
+        )
+        embed.add_field(name="Пользователь", value=interaction.author.mention, inline=True)
+        embed.add_field(name="Канал", value=interaction.channel.mention, inline=True)
+        embed.set_image(url="https://i.imgur.com/Y0MGCWI.png")
+
+        await self.send_webhook(settings['webhook_url']['command_log'], embed)
 
 # Информационные команды -----------------------------------------------------------------------------------------------------------------------
 
     @commands.slash_command(description="Информационные команды.\n\nИмеет подкоманды")
     async def info(self, interaction: disnake.ApplicationCommandInteraction):
+        embed = disnake.Embed(
+            title=f"Использование команды: `/info`",
+            color=disnake.Color.red()
+        )
+        embed.add_field(name="Пользователь", value=interaction.author.mention, inline=True)
+        embed.add_field(name="Канал", value=interaction.channel.mention, inline=True)
+        embed.set_image(url="https://i.imgur.com/Y0MGCWI.png")
+
+        await self.send_webhook(settings['webhook_url']['command_log'], embed)
         pass 
 
 # Информация о боте -----------------------------------------------------------------------------------------------------------
@@ -168,6 +186,18 @@ class Information(commands.Cog):
         embed.set_footer(text=f"ID гильдии - {guild_id}")
 
         await interaction.send(embed=embed)
+
+
+    async def send_webhook(self, webhook_url, embed=None, content=None):
+        try:
+            async with aiohttp.ClientSession() as session:
+                webhook = disnake.Webhook.from_url(webhook_url, session=session)
+                if embed:
+                    await webhook.send(embed=embed)
+                elif content:
+                    await webhook.send(content)
+        except Exception as e:
+            print(f"Ошибка при отправке вебхука: {e}")
 
 def setup(bot):
     bot.add_cog(Information(bot))
