@@ -1,11 +1,9 @@
 from imports import *
 
-# Функция для загрузки конфигурации
 def load_config():
     with open('config.json', 'r', encoding='utf-8') as f:
         return json.load(f)
 
-# Загрузка конфигурации
 settings = load_config()
 
 class Embed(commands.Cog):
@@ -13,17 +11,26 @@ class Embed(commands.Cog):
         self.bot = bot
         self.developer_role_id = settings['roles']['developer']['role_id']
         self.admin_role_id = settings['roles']['admin']['role_id']
-
+        self.allowed_roles = [
+            settings['roles']['developer']['role_id'],
+            settings['roles']['admin']['role_id'],
+        ]
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"Модуль {self.__class__.__name__} подключен.")
+
 
     def is_valid_url(self, url):
         """Проверяет, является ли строка действительным URL."""
         return url is not None and (url.startswith("http://") or url.startswith("https://"))
 
+
     @commands.slash_command(description="Создать эмбед из JSON")
-    async def create_embed(self, inter: disnake.CommandInteraction, json_data: str):
+    async def embed(self, inter: disnake.CommandInteraction, json_data: str):
+        allowed_role_ids = [self.admin_role_id, self.developer_role_id]
+        if interaction.user.id != owner_id and not any(role.id in allowed_role_ids for role in interaction.user.roles):
+            await interaction.response.send_message("Недостаточно прав для использования этой команды.", ephemeral=True)
+            return
         try:
             # Парсим JSON-строку
             data = json.loads(json_data)
@@ -110,6 +117,7 @@ class Embed(commands.Cog):
 
 
     @commands.slash_command(description="Отправить эмбед через вебхук")
+    @has_required_role()
     async def send_webhook_embed(self, inter: disnake.CommandInteraction, webhook_url: str, json_data: str):
         try:
             # Парсим JSON-строку
@@ -244,6 +252,25 @@ class Embed(commands.Cog):
                 text = text.replace(f"{{member_avatar:{member_id}}}", member_avatar_url if member_avatar_url else "")
 
         return text
+
+# Информация о вставках эмбеда -----------------------------------------------------------------------------------------------
+    @commands.slash_command(description="Помощь с эмбедом")
+    async def embed_help(self, interaction: disnake.ApplicationCommandInteraction):
+        allowed_role_ids = [self.admin_role_id, self.developer_role_id]
+        if interaction.user.id != owner_id and not any(role.id in allowed_role_ids for role in interaction.user.roles):
+            await interaction.response.send_message("Недостаточно прав для использования этой команды.", ephemeral=True)
+            return
+
+        embed = disnake.Embed(title="Маэстро помощи с эмбедом", color=disnake.Color.from_rgb(43, 45, 49))
+        embed.add_field(name="Название гильдии", value="```{guild}```", inline=True)
+        embed.add_field(name="Имя автора", value="```{author}```", inline=True)
+        embed.add_field(name="Имя бота", value="```{bot}```", inline=True)
+        embed.add_field(name="Аватарка автора", value="```{author_avatar}```", inline=True)
+        embed.add_field(name="Имя юзера", value="```{member:ID}```", inline=True)
+        embed.add_field(name="Аватарка юзера", value="```{member_avatar:ID}```", inline=True)
+
+        await interaction.send(embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Embed(bot))

@@ -136,22 +136,20 @@ class Information(commands.Cog):
 # Информация о гильдии -----------------------------------------------------------------------------------------------------------
     @info.sub_command(description="Информация о гильдии")
     async def guild(self, interaction: disnake.ApplicationCommandInteraction):
-        guild = interaction.guild  # Получаем объект гильдии из взаимодействия
+        guild = interaction.guild 
 
         guild_id = guild.id
         guild_name = guild.name
         member_count = guild.member_count
-        role_count = len(guild.roles) - 1  # Исключаем роль @everyone
+        role_count = len(guild.roles) - 1 
         created_at = guild.created_at.strftime("%Y-%m-%d %H:%M:%S")
-        owner = guild.owner  # Владелец гильдии
-        preferred_locale = guild.preferred_locale  # Локаль гильдии
-        icon_url = guild.icon.url if guild.icon else None  # URL иконки гильдии
-
-        # Сбор статистики по каналам
-        channel_count = len(guild.channels)  # Общее количество каналов
-        text_channel_count = len(guild.text_channels)  # Количество текстовых каналов
-        voice_channel_count = len(guild.voice_channels)  # Количество голосовых каналов
-        category_count = len(guild.categories)  # Количество категорий
+        owner = guild.owner
+        preferred_locale = guild.preferred_locale 
+        icon_url = guild.icon.url if guild.icon else None 
+        channel_count = len(guild.channels) 
+        text_channel_count = len(guild.text_channels) 
+        voice_channel_count = len(guild.voice_channels)
+        category_count = len(guild.categories) 
 
         embed = disnake.Embed(title="Информация о гильдии", color=disnake.Color.from_rgb(43, 45, 49))
         if icon_url:
@@ -170,13 +168,6 @@ class Information(commands.Cog):
         embed.set_footer(text=f"ID гильдии - {guild_id}")
 
         await interaction.send(embed=embed)
-
-
-
-
-
-
-
 
 def setup(bot):
     bot.add_cog(Information(bot))
