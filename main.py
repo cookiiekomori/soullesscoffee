@@ -86,6 +86,7 @@ class Cogs(str, Enum):
     Inform = 'inform'
     Logging = 'logging'
     Utils = 'utils'
+    Data = "data"
 
 # Загрузка модуля ------------------------------------------------------------------------------------------------------------
 @bot.slash_command(description="Загрузить модуль бота")
