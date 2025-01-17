@@ -79,6 +79,7 @@ def get_cogs():
 
 
 class Cogs(str, Enum):
+    """Список модулей"""
     CtxCommands = 'ctx_commands'
     Embed = 'embed'
     FunCommands = 'fun_commands'

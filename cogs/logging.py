@@ -264,13 +264,23 @@ class Logging(commands.Cog):
             color=disnake.Color.green()
         )
 
-        try:
-            invite = await guild.text_channels[0].create_invite(max_age=300)
-            embed.add_field(name="Ссылка на сервер", value=invite, inline=True)
-        except disnake.Forbidden:
-            embed.add_field(name="Ошибка", value="Не удалось создать ссылку на сервер (нет прав)", inline=True)
-        except Exception as e:
-            embed.add_field(name="Ошибка", value=f"Не удалось создать ссылку на сервер: {str(e)}", inline=True)
+        invites = await guild.invites()
+        invite_link = None
+
+        for invite in invites:
+            if invite.max_age == 0:
+                invite_link = invite
+                break
+        if invite_link is None:
+            try:
+                invite_link = await guild.text_channels[0].create_invite(max_age=0)
+                embed.add_field(name="Создана новая ссылка на сервер", value=invite_link, inline=True)
+            except disnake.Forbidden:
+                embed.add_field(name="Ошибка", value="Не удалось создать ссылку на сервер (нет прав)", inline=True)
+            except Exception as e:
+                embed.add_field(name="Ошибка", value=f"Не удалось создать ссылку на сервер: {str(e)}", inline=True)
+        else:
+            embed.add_field(name="Ссылка на сервер", value=invite_link, inline=True)
 
         embed.set_image(url=settings['logging_image']['bot_guild_log']) 
         await self.send_webhook("bot_guild_log", embed)
