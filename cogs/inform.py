@@ -11,7 +11,7 @@ def save_config(config):
 settings = load_config()
 
 class Information(commands.Cog):
-
+    """Информационный модуль"""
     def __init__(self, bot):
         self.bot = bot
 
@@ -30,7 +30,8 @@ class Information(commands.Cog):
             'update', 
             'send_webhook_embed', 
             'purge', 
-            'create_embed'
+            'embed_help',
+            'embed'
         ]
 
         embed = disnake.Embed(title="Список доступных команд", color=disnake.Color.from_rgb(43, 45, 49))

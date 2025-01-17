@@ -7,6 +7,7 @@ def load_config():
 settings = load_config()
 
 class Embed(commands.Cog):
+    """Модуль связанный с созданием эмбедов"""
     def __init__(self, bot):
         self.bot = bot
         self.developer_role_id = settings['roles']['developer']['role_id']

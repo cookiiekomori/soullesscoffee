@@ -7,6 +7,7 @@ def load_config():
 settings = load_config()
 
 class Logging(commands.Cog):
+    """Логирующий модуль"""
     def __init__(self, bot):
         self.bot = bot
         self.webhook_urls = settings['webhook_url']

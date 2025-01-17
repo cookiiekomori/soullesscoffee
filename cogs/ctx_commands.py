@@ -8,7 +8,7 @@ settings = load_config()
 
 
 class CTX_Commands(commands.Cog):
-
+    """Модуль, от которого скоро избавлюсь"""
     def __init__(self, bot):
         self.bot = bot
 

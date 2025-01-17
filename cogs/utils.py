@@ -11,7 +11,7 @@ def save_config(config):
 settings = load_config()
 
 class Utilites(commands.Cog):
-
+    """Утилиты"""
     def __init__(self, bot):
         self.bot = bot
 

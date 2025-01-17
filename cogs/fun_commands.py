@@ -9,6 +9,7 @@ settings = load_config()
 
 
 class FunCommands(commands.Cog):
+    """Фановые команды"""
     def __init__(self, bot):
         self.bot = bot
         self.config = load_config()
