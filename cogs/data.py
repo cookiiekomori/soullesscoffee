@@ -29,8 +29,9 @@ class Data(commands.Cog):
                         in_data = df[(df["Guild_id"] == guild.id) & (df["User_id"] == member.id)]
                         if in_data.empty:
                             df.loc[len(df)] = [guild.id, guild.name, member.name, member.id]
-                        # Шаг 3: Сохраните изменения обратно в CSV файл
                         df.to_csv('base_of_profiles.csv', index=False)
+        else:
+            await ctx.send("Недостаточно прав для использования этой команды!")
 
 
 def setup(bot):
