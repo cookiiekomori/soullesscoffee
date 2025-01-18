@@ -29,12 +29,11 @@ class FunCommands(commands.Cog):
         embed.set_image(url="https://i.imgur.com/Y0MGCWI.png")
 
         await self.send_webhook(settings['webhook_url']['command_log'], embed)
-        pass  # Это будет родительская команда, которая ничего не делае
+        pass  
 
 # Шлеп --------------------------------------------------------------------------------------------------------------------------
     @fun.sub_command(description="Шлепнуть по попе")
     async def slap(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
-        # Если пользователь не указан, используем автора команды
         if user is None:
             user = interaction.user
         roles = interaction.user.roles
@@ -69,20 +68,16 @@ class FunCommands(commands.Cog):
                 "https://media.tenor.com/v20N16whtvoAAAAM/butt-slap-booty-slap.gif"
             ]
 
-        # Создаем эмбед
         embed = disnake.Embed(
             description=description,
-            color=disnake.Color.from_rgb(43, 45, 49)  # Используем стандартный цвет
+            color=disnake.Color.from_rgb(43, 45, 49)
         )
         
-        # Выбираем случайную гифку из списка
         random_gif = random.choice(gif_list)
         embed.set_image(url=random_gif)
 
-        # Устанавливаем футер
         embed.set_footer(text="Отшлепан как следует")
 
-        # Отправляем эмбед
         await interaction.send(embed=embed)
 
 # Обнять --------------------------------------------------------------------------------------------------------------------------
