@@ -8,6 +8,9 @@ def load_config():
 settings = load_config()
 
 
+guild_configurations = pd.read_csv('Bases/guild_configurations.csv')
+guild_configurations.columns = guild_configurations.columns.str.strip()
+
 class FunCommands(commands.Cog):
     """Фановые команды"""
     def __init__(self, bot):
@@ -31,19 +34,32 @@ class FunCommands(commands.Cog):
         await self.send_webhook(settings['webhook_url']['command_log'], embed)
         pass  
 
-# Шлеп --------------------------------------------------------------------------------------------------------------------------
     @fun.sub_command(description="Шлепнуть по попе")
     async def slap(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+
+        # Получаем информацию о гильдии
+        guild_id = str(interaction.guild.id)
+
+        # Очистка данных
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
-        female_role_id = self.config["roles"]["female"]["role_id"]
-        male_role_id = self.config["roles"]["male"]["role_id"]
-        has_female_role = any(role.id == female_role_id for role in roles)
-        has_male_role = any(role.id == male_role_id for role in roles)
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
 
         if not has_female_role and not has_male_role:
-            await interaction.send("Ты по-моему что-то перепутал, ты либо не на том сервере, либо определи себя, мужчина ты или женщина, отказано в выполнении команды.")
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
             return
 
         if has_female_role:
@@ -53,7 +69,6 @@ class FunCommands(commands.Cog):
 
         if user == interaction.user:
             description = f"{interaction.user.mention} {action_description} себя по попе!"
-            # Список гифок для удара по себе
             gif_list = [
                 "https://media.tenor.com/AEWh7M4iBEYAAAAM/spanking-spank.gif",
                 "https://media.tenor.com/MWOs_f48n2cAAAAM/slap-my-ass-godku.gif",
@@ -61,7 +76,6 @@ class FunCommands(commands.Cog):
             ]
         else:
             description = f"{interaction.user.mention} {action_description} по попе {user.mention}!"
-            # Список гифок для удара по другому пользователю
             gif_list = [
                 "https://media.tenor.com/XW_ymVr5I6sAAAAM/slap-butt.gif", 
                 "https://media.tenor.com/AiLrNJMakwIAAAAM/mochi-bunny.gif",
@@ -85,14 +99,23 @@ class FunCommands(commands.Cog):
     async def hug(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_id = str(interaction.guild.id)
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
-        female_role_id = self.config["roles"]["female"]["role_id"]
-        male_role_id = self.config["roles"]["male"]["role_id"]
-        has_female_role = any(role.id == female_role_id for role in roles)
-        has_male_role = any(role.id == male_role_id for role in roles)
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
 
         if not has_female_role and not has_male_role:
-            await interaction.send("Ты по-моему что-то перепутал, ты либо не на том сервере, либо определи себя, мужчина ты или женщина, отказано в выполнении команды.")
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
             return
             
         if has_female_role:
@@ -129,14 +152,23 @@ class FunCommands(commands.Cog):
     async def kiss(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_id = str(interaction.guild.id)
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
-        female_role_id = self.config["roles"]["female"]["role_id"]
-        male_role_id = self.config["roles"]["male"]["role_id"]
-        has_female_role = any(role.id == female_role_id for role in roles)
-        has_male_role = any(role.id == male_role_id for role in roles)
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
 
         if not has_female_role and not has_male_role:
-            await interaction.send("Ты по-моему что-то перепутал, ты либо не на том сервере, либо определи себя, мужчина ты или женщина, отказано в выполнении команды.")
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
             return
             
         if has_female_role:
@@ -173,14 +205,23 @@ class FunCommands(commands.Cog):
     async def bite(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_id = str(interaction.guild.id)
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
-        female_role_id = self.config["roles"]["female"]["role_id"]
-        male_role_id = self.config["roles"]["male"]["role_id"]
-        has_female_role = any(role.id == female_role_id for role in roles)
-        has_male_role = any(role.id == male_role_id for role in roles)
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
 
         if not has_female_role and not has_male_role:
-            await interaction.send("Ты по-моему что-то перепутал, ты либо не на том сервере, либо определи себя, мужчина ты или женщина, отказано в выполнении команды.")
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
             return
             
         if has_female_role:
@@ -217,14 +258,23 @@ class FunCommands(commands.Cog):
     async def poke(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_id = str(interaction.guild.id)
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
-        female_role_id = self.config["roles"]["female"]["role_id"]
-        male_role_id = self.config["roles"]["male"]["role_id"]
-        has_female_role = any(role.id == female_role_id for role in roles)
-        has_male_role = any(role.id == male_role_id for role in roles)
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
 
         if not has_female_role and not has_male_role:
-            await interaction.send("Ты по-моему что-то перепутал, ты либо не на том сервере, либо определи себя, мужчина ты или женщина, отказано в выполнении команды.")
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
             return
             
         if has_female_role:
@@ -261,14 +311,23 @@ class FunCommands(commands.Cog):
     async def punch(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_id = str(interaction.guild.id)
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
-        female_role_id = self.config["roles"]["female"]["role_id"]
-        male_role_id = self.config["roles"]["male"]["role_id"]
-        has_female_role = any(role.id == female_role_id for role in roles)
-        has_male_role = any(role.id == male_role_id for role in roles)
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
 
         if not has_female_role and not has_male_role:
-            await interaction.send("Ты по-моему что-то перепутал, ты либо не на том сервере, либо определи себя, мужчина ты или женщина, отказано в выполнении команды.")
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
             return
             
         if has_female_role:
@@ -305,14 +364,23 @@ class FunCommands(commands.Cog):
     async def sex(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_id = str(interaction.guild.id)
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
-        female_role_id = self.config["roles"]["female"]["role_id"]
-        male_role_id = self.config["roles"]["male"]["role_id"]
-        has_female_role = any(role.id == female_role_id for role in roles)
-        has_male_role = any(role.id == male_role_id for role in roles)
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
 
         if not has_female_role and not has_male_role:
-            await interaction.send("Ты по-моему что-то перепутал, ты либо не на том сервере, либо определи себя, мужчина ты или женщина, отказано в выполнении команды.")
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
             return
             
         if has_female_role:
@@ -349,9 +417,31 @@ class FunCommands(commands.Cog):
     async def angry(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_id = str(interaction.guild.id)
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
+
+        if not has_female_role and not has_male_role:
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
+            return
+            
+        if has_female_role:
+            action_description = "злится"
+        else:
+            action_description = "злится"
         if user == interaction.user:
-            description = f"{interaction.user.mention} злится"
+            description = f"{interaction.user.mention} {action_description}"
             # по себе
             gif_list = [
                 "https://media.tenor.com/qPaInIyQjnQAAAAM/mad-angry.gif",
@@ -359,7 +449,7 @@ class FunCommands(commands.Cog):
                 "https://media.tenor.com/4jTua9zpKD0AAAAM/simpson-homer-simpson.gif"
             ]
         else:
-            description = f"{interaction.user.mention} злится на {user.mention}"
+            description = f"{interaction.user.mention} {action_description} на {user.mention}"
             # по другому пользователю
             gif_list = [
                 "https://media.tenor.com/qPaInIyQjnQAAAAM/mad-angry.gif",
@@ -380,9 +470,31 @@ class FunCommands(commands.Cog):
     async def dance(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_id = str(interaction.guild.id)
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
+
+        if not has_female_role and not has_male_role:
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
+            return
+            
+        if has_female_role:
+            action_description = "танцует"
+        else:
+            action_description = "танцует"
         if user == interaction.user:
-            description = f"{interaction.user.mention} танцует"
+            description = f"{interaction.user.mention} {action_description}"
             # по себе
             gif_list = [
                 "https://media.tenor.com/oaY8DO-f6-kAAAAM/breakdancing-shigeyuki-nakarai.gif",
@@ -390,7 +502,7 @@ class FunCommands(commands.Cog):
                 "https://media.tenor.com/-IGv_i2BXpAAAAAM/gefeliciteerd.gif"
             ]
         else:
-            description = f"{interaction.user.mention} танцует с {user.mention}"
+            description = f"{interaction.user.mention} {action_description} с {user.mention}"
             # по другому пользователю
             gif_list = [
                 "https://media.tenor.com/mZNM3h1YceEAAAAM/ppz-dance.gif",
@@ -411,9 +523,31 @@ class FunCommands(commands.Cog):
     async def sad(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_id = str(interaction.guild.id)
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
+
+        if not has_female_role and not has_male_role:
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
+            return
+            
+        if has_female_role:
+            action_description = "грустит"
+        else:
+            action_description = "грустит"
         if user == interaction.user:
-            description = f"{interaction.user.mention} грустит"
+            description = f"{interaction.user.mention} {action_description}"
             # по себе
             gif_list = [
                 "https://media.tenor.com/g2Ykg_KwrhgAAAAM/sad.gif",
@@ -423,7 +557,7 @@ class FunCommands(commands.Cog):
                 "https://media.tenor.com/HG-U3mueAZcAAAAM/sad-sigh.gif"
             ]
         else:
-            description = f"{interaction.user.mention} грустит из-за {user.mention}"
+            description = f"{interaction.user.mention} {action_description} из-за {user.mention}"
             # по другому пользователю
             gif_list = [
                 "https://media.tenor.com/g2Ykg_KwrhgAAAAM/sad.gif",
@@ -446,9 +580,31 @@ class FunCommands(commands.Cog):
     async def happy(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_id = str(interaction.guild.id)
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
+
+        if not has_female_role and not has_male_role:
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
+            return
+            
+        if has_female_role:
+            action_description = "радуется"
+        else:
+            action_description = "радуется"
         if user == interaction.user:
-            description = f"{interaction.user.mention} радуется"
+            description = f"{interaction.user.mention} {action_description}"
             # по себе
             gif_list = [
                 "https://media.tenor.com/4DirSqJdE1AAAAAM/happy-day-fun-day.gif",
@@ -457,7 +613,7 @@ class FunCommands(commands.Cog):
                 "https://media.tenor.com/M2cCDtStnvYAAAAj/hasher-happy-sticker.gif"
             ]
         else:
-            description = f"{interaction.user.mention} радуется благодаря {user.mention}"
+            description = f"{interaction.user.mention} {action_description} благодаря {user.mention}"
             # по другому пользователю
             gif_list = [
                 "https://media.tenor.com/4DirSqJdE1AAAAAM/happy-day-fun-day.gif",
@@ -479,9 +635,31 @@ class FunCommands(commands.Cog):
     async def laugh(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_id = str(interaction.guild.id)
+        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
+        guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
+
+        if guild_info.empty:
+            await interaction.send("Конфигурация гендерных ролей не настроена")
+            return
+
+        female_role_id = str(guild_info['Female_role_id'].values[0])
+        male_role_id = str(guild_info['Male_role_id'].values[0])
         roles = interaction.user.roles
+
+        has_female_role = any(role.id == int(female_role_id) for role in roles)
+        has_male_role = any(role.id == int(male_role_id) for role in roles)
+
+        if not has_female_role and not has_male_role:
+            await interaction.send("Без гендерной роли доступ к команде отказан.")
+            return
+            
+        if has_female_role:
+            action_description = "смеется"
+        else:
+            action_description = "смеется"
         if user == interaction.user:
-            description = f"{interaction.user.mention} смеется, хихи хаха"
+            description = f"{interaction.user.mention} {action_description}, хихи, хаха"
             # по себе
             gif_list = [
                 "https://media.tenor.com/WGdyB0HjFVIAAAAM/lmao-meme.gif",
@@ -492,7 +670,7 @@ class FunCommands(commands.Cog):
                 "https://media.tenor.com/bwT923MexkMAAAAM/j-jonah-jameson-laugh.gif"
             ]
         else:
-            description = f"{interaction.user.mention} смеется над {user.mention}"
+            description = f"{interaction.user.mention} {action_description} над {user.mention}"
             # по другому пользователю
             gif_list = [
                 "https://media.tenor.com/WGdyB0HjFVIAAAAM/lmao-meme.gif",
