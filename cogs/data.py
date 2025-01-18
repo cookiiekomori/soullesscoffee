@@ -25,11 +25,11 @@ class Data(commands.Cog):
             for guild in self.bot.guilds:
                 for member in guild.members:
                     if not member.bot:
-                        df = pd.read_csv('base_of_profiles.csv')
+                        df = pd.read_csv('Bases\\base_of_profiles.csv')
                         in_data = df[(df["Guild_id"] == guild.id) & (df["User_id"] == member.id)]
                         if in_data.empty:
                             df.loc[len(df)] = [guild.id, guild.name, member.name, member.id]
-                        df.to_csv('base_of_profiles.csv', index=False)
+                        df.to_csv('Bases\\base_of_profiles.csv', index=False)
         else:
             await ctx.send("Недостаточно прав для использования этой команды!")
 

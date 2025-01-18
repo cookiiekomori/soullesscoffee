@@ -117,6 +117,7 @@ class Utilites(commands.Cog):
             await interaction.response.send_message(f"Вы можете использовать эту команду снова через {error.retry_after:.2f} секунд.", ephemeral=True)
 
 
+
     async def send_webhook(self, webhook_url, embed=None, content=None):
         try:
             async with aiohttp.ClientSession() as session:
@@ -128,6 +129,28 @@ class Utilites(commands.Cog):
         except Exception as e:
             print(f"Ошибка при отправке вебхука: {e}")
 # --------------------------------------------------------------------------------------------------------------------------------------
+
+    @commands.slash_command(description="Команда для конфигурации бота")
+    @commands.is_owner()
+    async def configuration(self, interaction: disnake.ApplicationCommandInteraction):
+        embed = disnake.Embed(
+            title=f"Использование команды: `/configuration`",
+            color=disnake.Color.red()
+        )
+        embed.add_field(name="Пользователь", value=interaction.author.mention, inline=True)
+        embed.add_field(name="Канал", value=interaction.channel.mention, inline=True)
+        embed.set_image(url="https://i.imgur.com/Y0MGCWI.png")
+
+        await self.send_webhook(settings['webhook_url']['command_log'], embed)
+        pass
+
+    @update.sub_command(name='male', description='Вписать id мужской роли')
+    async def male(self, ctx, args):
+        pass
+
+
+
+
 
 
 def setup(bot):
