@@ -94,7 +94,8 @@ class Cogs(str, Enum):
     Logging = 'logging'
     Utils = 'utils'
     Data = "data"
-    Tickets = "tickets"
+    Tickets = "ticket"
+    Report = "report"
 
 # Загрузка модуля ------------------------------------------------------------------------------------------------------------
 @bot.slash_command(guild_ids=[854309914788626442], description="Загрузить модуль бота")
