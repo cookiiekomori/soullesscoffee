@@ -5,7 +5,7 @@ def load_config():
         return json.load(f)
 
 settings = load_config()
-WEBHOOK_URL = settings['webhook_url']['command_log']
+WEBHOOK_URL = settings['webhook_url']['report_log']
 
 class ReportModal(disnake.ui.Modal):
     def __init__(self, user: disnake.User):
