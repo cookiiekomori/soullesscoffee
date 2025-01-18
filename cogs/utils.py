@@ -133,7 +133,7 @@ class Utilites(commands.Cog):
 # --------------------------------------------------------------------------------------------------------------------------------------
 
     @commands.slash_command(description="Команда для конфигурации бота")
-    @commands.is_owner()
+    @commands.has_permissions(administrator=True)
     async def configuration(self, interaction: disnake.ApplicationCommandInteraction):
         embed = disnake.Embed(
             title=f"Использование команды: `/configuration`",
