@@ -146,17 +146,16 @@ class Utilites(commands.Cog):
         await self.send_webhook(settings['webhook_url']['command_log'], embed)
         pass
 
-    @configuration.sub_command(name='Гендер роль', description='Вписать id мужской роли и женской роли')
+    @configuration.sub_command(name='gender', description='Вписать id мужской роли и женской роли')
     async def gender(self, ctx, male_role_id, female_role_id):
         df = pd.read_csv('Bases\\guild_configurations.csv')
-        in_data = df[(df["Guild_id"] == ctx.guild.id) & (df["Male_role_id"] == int(male_role_id) & (df["Female_role_id"] == int(female_role_id)))]
+        in_data = df[(df["Guild_id"] == int(ctx.guild.id)) & (df["Male_role_id"] == int(male_role_id)) & (df["Female_role_id"] == int(female_role_id))]
         if in_data.empty:
-            df.loc[len(df)] = [ctx.guild.name, ctx.guild.id, int(male_role_id), int(female_role_id)]
+            df.loc[len(df)] = [ctx.guild.name, int(ctx.guild.id), int(male_role_id), int(female_role_id)]
+            await ctx.send("Роли были добавлены")
+        else:
+            await ctx.send("Эти роли уже добавлены")
         df.to_csv('Bases\\guild_configurations.csv', index=False)
-
-
-
-
 
 
 def setup(bot):
