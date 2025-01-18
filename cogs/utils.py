@@ -19,6 +19,38 @@ class Utilites(commands.Cog):
     async def on_ready(self):
         print(f"Модуль {self.__class__.__name__} подключен.")
 
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        # Получаем информацию о боте и авторе
+        bot_user = self.bot.user
+        author = guild.owner  # Владелец сервера
+        member = guild.me  # Бот как участник сервера
+
+        # Создаем эмбед
+        embed = disnake.Embed(title="Настройка бота под Ваш сервер", 
+            description="Для корректной работы бота на сервере, ему необходима настройка.\nНиже представлен список команд\n\n",
+            color=disnake.Color.from_rgb(43, 45, 49))
+        embed.add_field(name="Гендерные роли\nПредназначены для работы с /fun.. командами", value=f"```/configuration gender male_id female_id```", inline=False)
+        embed.add_field(name="Модерационные роли", value=f"```Тут какой-то текст```", inline=False)
+        embed.add_field(name="Тут какой-то текст", value=f"```Тут какой-то текст```", inline=False)
+
+        # Попытка отправить в ЛС владельцу сервера
+        try:
+            await author.send(embed=embed)
+        except disnake.Forbidden:
+            # Если не удалось отправить в ЛС, создаем закрытый канал
+            overwrites = {
+                guild.default_role: disnake.PermissionOverwrite(read_messages=False),  # Запретить всем
+                author: disnake.PermissionOverwrite(read_messages=True)  # Разрешить владельцу
+            }
+            private_channel = await guild.create_text_channel(
+                name=f"private-{author.name}",
+                overwrites=overwrites,
+                reason="Создан для отправки сообщения владельцу сервера"
+            )
+            await private_channel.send(embed=embed)
+            await private_channel.send(f"{author.mention}, это ваш закрытый канал для общения с ботом.")
+
     @commands.slash_command(guild_ids=[854309914788626442], description="Команда для обновления версии бота")
     @commands.is_owner()
     async def update(self, interaction: disnake.ApplicationCommandInteraction):

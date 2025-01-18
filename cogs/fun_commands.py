@@ -7,15 +7,17 @@ def load_config():
 
 settings = load_config()
 
-
-guild_configurations = pd.read_csv('Bases/guild_configurations.csv')
-guild_configurations.columns = guild_configurations.columns.str.strip()
-
 class FunCommands(commands.Cog):
     """Фановые команды"""
     def __init__(self, bot):
         self.bot = bot
         self.config = load_config()
+
+    def load_guild_configurations(self):
+        df = pd.read_csv('Bases/guild_configurations.csv')
+        df.columns = df.columns.str.strip()
+        df['Guild_id'] = df['Guild_id'].astype(str).str.strip() 
+        return df
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -38,13 +40,8 @@ class FunCommands(commands.Cog):
     async def slap(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
-
-        # Получаем информацию о гильдии
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-
-        # Очистка данных
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
-
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
@@ -99,8 +96,8 @@ class FunCommands(commands.Cog):
     async def hug(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
@@ -152,8 +149,8 @@ class FunCommands(commands.Cog):
     async def kiss(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
@@ -205,8 +202,8 @@ class FunCommands(commands.Cog):
     async def bite(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
@@ -258,8 +255,8 @@ class FunCommands(commands.Cog):
     async def poke(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
@@ -311,8 +308,8 @@ class FunCommands(commands.Cog):
     async def punch(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
@@ -364,8 +361,8 @@ class FunCommands(commands.Cog):
     async def sex(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
@@ -417,8 +414,8 @@ class FunCommands(commands.Cog):
     async def angry(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
@@ -470,8 +467,8 @@ class FunCommands(commands.Cog):
     async def dance(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
@@ -523,8 +520,8 @@ class FunCommands(commands.Cog):
     async def sad(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
@@ -580,8 +577,8 @@ class FunCommands(commands.Cog):
     async def happy(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
@@ -635,8 +632,8 @@ class FunCommands(commands.Cog):
     async def laugh(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User = None):
         if user is None:
             user = interaction.user
+        guild_configurations = self.load_guild_configurations()
         guild_id = str(interaction.guild.id)
-        guild_configurations['Guild_id'] = guild_configurations['Guild_id'].astype(str).str.strip()
         guild_info = guild_configurations[guild_configurations['Guild_id'] == guild_id]
 
         if guild_info.empty:
