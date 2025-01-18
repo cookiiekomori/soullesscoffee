@@ -19,7 +19,7 @@ class Utilites(commands.Cog):
     async def on_ready(self):
         print(f"Модуль {self.__class__.__name__} подключен.")
 
-    @commands.slash_command(description="Команда для обновления версии бота")
+    @commands.slash_command(guild_ids=[854309914788626442], description="Команда для обновления версии бота")
     @commands.is_owner()
     async def update(self, interaction: disnake.ApplicationCommandInteraction):
         embed = disnake.Embed(
@@ -37,7 +37,7 @@ class Utilites(commands.Cog):
         return [filename[:-3] for filename in os.listdir("cogs") if filename.endswith(".py")]
 
 # Обновление мажорной версии -----------------------------------------------------------------------------------------------
-    @update.sub_command(description="Увеличить мажорную версию на 1")
+    @update.sub_command(guild_ids=[854309914788626442], description="Увеличить мажорную версию на 1")
     async def congratulation(self, interaction: disnake.ApplicationCommandInteraction):
         config = load_config()
         major, minor, patch = map(int, config['version'].split('.'))
@@ -51,7 +51,7 @@ class Utilites(commands.Cog):
         await interaction.response.send_message(f"Версия обновлена до: {config['version']}")
 
 # Рестарт бота -------------------------------------------------------------------------------------------------------------
-    @update.sub_command(name='commit', description='Залить обновление на GitHub')
+    @update.sub_command(guild_ids=[854309914788626442], name='commit', description='Залить обновление на GitHub')
     async def commit(self, interaction: disnake.ApplicationCommandInteraction):
         await interaction.response.send_message("Начинаю обновление...")
         config = load_config()
@@ -77,7 +77,7 @@ class Utilites(commands.Cog):
             await interaction.followup.send(f"Произошла ошибка при обновлении: {e}")
 
 # Перезапуск бота -------------------------------------------------------------------------------------------------------------
-    @update.sub_command(name='restart', description='Перезагрузить бота')
+    @update.sub_command(guild_ids=[854309914788626442], name='restart', description='Перезагрузить бота')
     async def restart(self, interaction: disnake.ApplicationCommandInteraction):
         await interaction.response.send_message("Перезагрузка бота...")
         os.execv(sys.executable, ['python'] + sys.argv)

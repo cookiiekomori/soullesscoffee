@@ -80,7 +80,7 @@ class Information(commands.Cog):
         version = settings['version']
         python_version = sys.version.split()[0]
         disnake_version = disnake.__version__
-        support_server_link = "[>тык<](https://discord.gg/ZSUpv25GRz)"
+        support_server_link = "**<:22915developer:1298592276720779294> [Сервер поддержки](https://discord.gg/ZSUpv25GRz)**"
         
         command_count = len(self.bot.commands) + len(self.bot.application_commands)
 
@@ -93,7 +93,7 @@ class Information(commands.Cog):
         embed.add_field(name="Версия Python", value=f"```{python_version}```", inline=True)
         embed.add_field(name="Версия Disnake", value=f"```{disnake_version}```", inline=True)
         embed.add_field(name="Версия бота", value=f"```{version}```", inline=True)
-        embed.add_field(name="Ссылка на сервер поддержки", value=support_server_link, inline=False)
+        embed.add_field(name="Полезные ссылки:", value=support_server_link, inline=False)
         embed.set_footer(text=f"Пинг {ping} ms")
 
         await interaction.send(embed=embed)

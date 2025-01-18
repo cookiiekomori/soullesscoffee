@@ -77,6 +77,13 @@ for filename in os.listdir("cogs"):
 def get_cogs():
     return [filename[:-3] for filename in os.listdir("cogs") if filename.endswith(".py")]
 
+def is_owner():
+    async def predicate(interaction: disnake.CommandInteraction):
+        if interaction.user.id != bot.owner_id:
+            await interaction.response.send_message("У вас нет доступа к этой команде.", ephemeral=True)
+            return False
+        return True
+    return commands.check(predicate)
 
 class Cogs(str, Enum):
     """Список модулей"""
@@ -87,9 +94,10 @@ class Cogs(str, Enum):
     Logging = 'logging'
     Utils = 'utils'
     Data = "data"
+    Tickets = "tickets"
 
 # Загрузка модуля ------------------------------------------------------------------------------------------------------------
-@bot.slash_command(description="Загрузить модуль бота")
+@bot.slash_command(guild_ids=[854309914788626442], description="Загрузить модуль бота")
 @commands.is_owner()
 async def load(inter: disnake.CommandInteraction, 
                 module: Cogs = disnake.Option(name="module", 
@@ -104,7 +112,7 @@ async def load(inter: disnake.CommandInteraction,
         await inter.response.send_message(f"Ошибка при загрузке модуля `{module}`: {e}", ephemeral=True)
 
 # Выгрузка модуля ------------------------------------------------------------------------------------------------------------
-@bot.slash_command(description="Выгрузить модуль бота")
+@bot.slash_command(guild_ids=[854309914788626442], description="Выгрузить модуль бота")
 @commands.is_owner()
 async def unload(inter: disnake.CommandInteraction, 
                   module: Cogs = disnake.Option(name="module", 
@@ -119,7 +127,7 @@ async def unload(inter: disnake.CommandInteraction,
         await inter.response.send_message(f"Ошибка при выгрузке модуля `{module}`: {e}", ephemeral=True)
 
 # Перезагрузка модуля ------------------------------------------------------------------------------------------------------------
-@bot.slash_command(description="Перезагрузить модуль бота")
+@bot.slash_command(guild_ids=[854309914788626442], description="Перезагрузить модуль бота")
 @commands.is_owner()
 async def reload(inter: disnake.CommandInteraction, 
                   module: Cogs = disnake.Option(name="module", 
@@ -132,6 +140,15 @@ async def reload(inter: disnake.CommandInteraction,
         
     except Exception as e:
         await inter.response.send_message(f"Ошибка при перезагрузке модуля `{module}`: {e}", ephemeral=True)
+
+@bot.slash_command()
+async def confirm(inter: disnake.CommandInteraction):
+    await inter.response.send_modal(
+        title="Подтверждение",
+        custom_id="confirm-or-deny",
+        components=[disnake.ui.TextInput(label="подтвердить?", custom_id="confirm")],
+    )
+    await inter.followup.send(content="Пожалуйста, не закрывайте модальное окно!", ephemeral=True)
 
 
 bot.run(settings['token'])
