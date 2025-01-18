@@ -45,6 +45,10 @@ class ReportCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f"Модуль {self.__class__.__name__} подключен.")
+
     @commands.slash_command(name="report", description="Репорт пользователя")
     async def report(self, interaction: disnake.ApplicationCommandInteraction, user: disnake.User):
         """Отправка репорта"""
