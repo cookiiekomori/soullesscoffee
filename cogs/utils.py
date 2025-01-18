@@ -152,9 +152,9 @@ class Utilites(commands.Cog):
         in_data = df[(df["Guild_id"] == int(ctx.guild.id)) & (df["Male_role_id"] == int(male_role_id)) & (df["Female_role_id"] == int(female_role_id))]
         if in_data.empty:
             df.loc[len(df)] = [ctx.guild.name, int(ctx.guild.id), int(male_role_id), int(female_role_id)]
-            await ctx.send("Роли были добавлены")
+            await ctx.send("Успешно! Гендерные роли были добавлены!", ephemeral=True)
         else:
-            await ctx.send("Эти роли уже добавлены")
+            await ctx.send("Ошибка! Роли уже были добавлены", ephemeral=True)
         df.to_csv('Bases\\guild_configurations.csv', index=False)
 
 
