@@ -146,8 +146,8 @@ class Utilites(commands.Cog):
         await self.send_webhook(settings['webhook_url']['command_log'], embed)
         pass
 
-    @configuration.sub_command(name='male_and_female', description='Вписать id мужской роли и женской роли')
-    async def male_and_female(self, ctx, male_role_id, female_role_id):
+    @configuration.sub_command(name='Гендер роль', description='Вписать id мужской роли и женской роли')
+    async def gender(self, ctx, male_role_id, female_role_id):
         df = pd.read_csv('Bases\\guild_configurations.csv')
         in_data = df[(df["Guild_id"] == ctx.guild.id) & (df["Male_role_id"] == int(male_role_id) & (df["Female_role_id"] == int(female_role_id)))]
         if in_data.empty:
