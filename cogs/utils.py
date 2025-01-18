@@ -83,17 +83,11 @@ class Utilites(commands.Cog):
         os.execv(sys.executable, ['python'] + sys.argv)
 
 # Purge command ----------------------------------------------------------------------------------------------------------------
-    def is_owner_or_cooldown():
-        def predicate(interaction: disnake.CommandInteraction):
-            command = interaction.data['name']
-            cmd = interaction.bot.get_slash_command(command)
-            return interaction.author.id == interaction.bot.owner_id or not cmd.is_on_cooldown(interaction)
-        return commands.check(predicate)
-
     @commands.slash_command(description="Очищает указанное количество сообщений из канала.")
+    @commands.cooldown(1, 20, commands.BucketType.user)
     @commands.has_permissions(manage_messages=True)
-    @is_owner_or_cooldown()
     async def purge(self, interaction: disnake.CommandInteraction, amount: int = None):
+
         if amount is None:
             await interaction.response.send_message("Пожалуйста, укажите количество сообщений для удаления.", ephemeral=True)
             return
