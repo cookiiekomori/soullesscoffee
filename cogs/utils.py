@@ -87,7 +87,6 @@ class Utilites(commands.Cog):
     @commands.cooldown(1, 20, commands.BucketType.user)
     @commands.has_permissions(manage_messages=True)
     async def purge(self, interaction: disnake.CommandInteraction, amount: int = None):
-
         if amount is None:
             await interaction.response.send_message("Пожалуйста, укажите количество сообщений для удаления.", ephemeral=True)
             return
@@ -96,7 +95,10 @@ class Utilites(commands.Cog):
             if amount < 1 or amount > 20:
                 await interaction.response.send_message("Количество сообщений должно быть от 1 до 20.", ephemeral=True)
                 return
+                
+        await self.clear_messages(interaction, amount)
 
+    async def clear_messages(self, interaction: disnake.CommandInteraction, amount: int):
         deleted = await interaction.channel.purge(limit=amount)
         await interaction.response.send_message(f"Удалено {len(deleted)} сообщений.", ephemeral=True)
 
@@ -115,6 +117,7 @@ class Utilites(commands.Cog):
     async def purge_error(self, interaction: disnake.CommandInteraction, error):
         if isinstance(error, commands.CommandOnCooldown):
             await interaction.response.send_message(f"Вы можете использовать эту команду снова через {error.retry_after:.2f} секунд.", ephemeral=True)
+
 
 
     async def send_webhook(self, webhook_url, embed=None, content=None):
