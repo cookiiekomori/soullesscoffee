@@ -1,7 +1,7 @@
 from imports import *
 
 class TicketCog(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot, db_manager):
         self.bot = bot
         self.base_path = "Bases/base_of_tickets.csv"
 
@@ -165,5 +165,5 @@ class TicketCog(commands.Cog):
             self.update_ticket_data()
 
 
-def setup(bot):
-    bot.add_cog(TicketCog(bot))
+def setup(bot, db_manager):
+    bot.add_cog(TicketCog(bot, db_manager))

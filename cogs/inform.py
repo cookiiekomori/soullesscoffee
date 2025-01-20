@@ -12,7 +12,7 @@ settings = load_config()
 
 class Information(commands.Cog):
     """Информационный модуль"""
-    def __init__(self, bot):
+    def __init__(self, bot, db_manager):
         self.bot = bot
 
     @commands.Cog.listener()
@@ -200,5 +200,5 @@ class Information(commands.Cog):
         except Exception as e:
             print(f"Ошибка при отправке вебхука: {e}")
 
-def setup(bot):
-    bot.add_cog(Information(bot))
+def setup(bot, db_manager):
+    bot.add_cog(Information(bot, db_manager))

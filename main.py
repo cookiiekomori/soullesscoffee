@@ -16,6 +16,7 @@ intents.message_content = True
 intents.voice_states = True
 intents.guilds = True 
 bot = commands.Bot(command_prefix=settings['prefix'], intents=intents)
+db_manager = DatabaseManager('Bases/base_of_profiles.csv')
 
 print("Идет процесс запуска, ожидайте...")
 
@@ -70,9 +71,28 @@ async def status_task(bot):
             await asyncio.sleep(5)
 
 
+
 for filename in os.listdir("cogs"):
     if filename.endswith(".py"):
-        bot.load_extension("cogs." + filename[:-3])
+        module_name = f"cogs.{filename[:-3]}"
+        module = __import__(module_name, fromlist=['setup'])
+        
+        # Получаем объект функции setup
+        setup_function = getattr(module, 'setup', None)
+        
+        if setup_function:
+            # Получаем параметры функции
+            sig = inspect.signature(setup_function)
+            params = sig.parameters
+            
+            # Проверяем количество параметров
+            if len(params) == 2:
+                setup_function(bot, db_manager)  # Если 2 параметра, вызываем с обоими
+            elif len(params) == 1:
+                setup_function(bot)  # Если 1 параметр, вызываем только с bot
+            else:
+                print(f"Функция setup в {filename} имеет неподдерживаемое количество параметров.")
+
 
 def get_cogs():
     return [filename[:-3] for filename in os.listdir("cogs") if filename.endswith(".py")]
@@ -87,6 +107,7 @@ def is_owner():
 
 class Cogs(str, Enum):
     """Список модулей"""
+    Profiles = "profiles"
     CtxCommands = 'ctx_commands'
     Embed = 'embed'
     FunCommands = 'fun_commands'

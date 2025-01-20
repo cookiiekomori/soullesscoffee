@@ -9,7 +9,7 @@ settings = load_config()
 
 class FunCommands(commands.Cog):
     """Фановые команды"""
-    def __init__(self, bot):
+    def __init__(self, bot, db_manager):
         self.bot = bot
         self.config = load_config()
 
@@ -698,5 +698,5 @@ class FunCommands(commands.Cog):
         except Exception as e:
             print(f"Ошибка при отправке вебхука: {e}")
 
-def setup(bot):
-    bot.add_cog(FunCommands(bot))
+def setup(bot, db_manager):
+    bot.add_cog(FunCommands(bot, db_manager))

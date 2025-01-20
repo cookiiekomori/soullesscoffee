@@ -8,7 +8,7 @@ settings = load_config()
 
 class Logging(commands.Cog):
     """Логирующий модуль"""
-    def __init__(self, bot):
+    def __init__(self, bot, db_manager):
         self.bot = bot
         self.webhook_urls = settings['webhook_url']
         
@@ -461,6 +461,6 @@ class Logging(commands.Cog):
         embed.set_image(url=settings['logging_image']['member_ban_log']) 
         await self.send_webhook("member_ban_log", embed)
 
-def setup(bot):
-    bot.add_cog(Logging(bot))
+def setup(bot, db_manager):
+    bot.add_cog(Logging(bot, db_manager))
 
