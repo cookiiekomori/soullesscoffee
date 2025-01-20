@@ -114,7 +114,7 @@ class Cogs(str, Enum):
     Inform = 'inform'
     Logging = 'logging'
     Utils = 'utils'
-    Data = "data"
+    Level = "levels"
     Tickets = "ticket"
     Report = "report"
 
