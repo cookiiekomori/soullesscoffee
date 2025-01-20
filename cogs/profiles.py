@@ -31,30 +31,29 @@ class Profiles(commands.Cog):
             await ctx.send("Профиль не найден.")
             return
 
-        # Загрузка фонового изображения
         custom_image_path = "C:\\Users\\cooki\\Pictures\\Adobe Images\\done\\Desiign_bot\\profile_design.png"
         custom_image = Image.open(custom_image_path)
 
-        # Создаем новое изображение профиля с фоном
-        profile_image = Image.new("RGBA", custom_image.size, (255, 255, 255, 0))  # Прозрачный фон
-        profile_image.paste(custom_image, (0, 0))  # Накладываем фоновое изображение
+        profile_image = Image.new("RGBA", custom_image.size, (255, 255, 255, 0)) 
+        profile_image.paste(custom_image, (0, 0)) 
 
-        # Загрузка аватара
-        avatar_url = str(member.avatar.url)
-        avatar_response = requests.get(avatar_url)
+        # Проверяем, есть ли у участника аватарка
+        if member.avatar:
+            avatar_url = str(member.avatar.url)
+            avatar_response = requests.get(avatar_url)
 
-        if avatar_response.status_code == 200:
-            avatar = Image.open(io.BytesIO(avatar_response.content)).resize((160, 160))  # Размер аватарки
+            if avatar_response.status_code == 200:
+                avatar = Image.open(io.BytesIO(avatar_response.content)).resize((160, 160))  
 
-            mask = Image.new('L', (160, 160), 0)
-            draw = ImageDraw.Draw(mask)
-            draw.ellipse((0, 0, 160, 160), fill=255)
+                mask = Image.new('L', (160, 160), 0)
+                draw = ImageDraw.Draw(mask)
+                draw.ellipse((0, 0, 160, 160), fill=255)
 
-            avatar.putalpha(mask)
-            profile_image.paste(avatar, (39, 29), avatar)  # Накладываем аватар на фон
-        else:
-            await ctx.send("Не удалось загрузить аватарку пользователя.")
-            return
+                avatar.putalpha(mask)
+                profile_image.paste(avatar, (39, 29), avatar)
+            else:
+                await ctx.send("Не удалось загрузить аватарку пользователя.")
+                return
 
 
         draw = ImageDraw.Draw(profile_image)
@@ -95,11 +94,10 @@ class Profiles(commands.Cog):
             additional_image_path = "C:\\Users\\cooki\\Pictures\\Adobe Images\\done\\Desiign_bot\\LOGO_prog.png" 
             if os.path.exists(additional_image_path):
                 additional_image = Image.open(additional_image_path).resize((54, 54))
-                profile_image.paste(additional_image, (25, 238), additional_image)  # Позиция изображения
+                profile_image.paste(additional_image, (25, 238), additional_image) 
             else:
                 print(f"Изображение не найдено: {additional_image_path}")
 
-        # Сохраняем изображение в буфер
         with io.BytesIO() as image_binary:
             profile_image.save(image_binary, 'PNG')
             image_binary.seek(0)
