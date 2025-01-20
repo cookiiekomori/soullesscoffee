@@ -9,7 +9,7 @@ settings = load_config()
 
 class CTX_Commands(commands.Cog):
     """Модуль, от которого скоро избавлюсь"""
-    def __init__(self, bot):
+    def __init__(self, bot, db_manager):
         self.bot = bot
 
         self.developer_role_id = settings['roles']['developer']['role_id']
@@ -52,5 +52,5 @@ class CTX_Commands(commands.Cog):
         await channel.send(message)
         await ctx.send(f"Сообщение отправлено в канал {channel.mention}.")
 
-def setup(bot):
-    bot.add_cog(CTX_Commands(bot))
+def setup(bot, db_manager):
+    bot.add_cog(CTX_Commands(bot, db_manager))

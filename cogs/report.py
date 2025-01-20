@@ -42,7 +42,7 @@ class ReportModal(disnake.ui.Modal):
         await interaction.response.send_message(f"Пользователь {self.user.mention} был репортнут за:\n{reason}", ephemeral=True)
 
 class Report(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot, db_manager):
         self.bot = bot
 
     @commands.Cog.listener()
@@ -55,5 +55,5 @@ class Report(commands.Cog):
         modal = ReportModal(user)
         await interaction.response.send_modal(modal)
 
-def setup(bot):
-    bot.add_cog(Report(bot))
+def setup(bot, db_manager):
+    bot.add_cog(Report(bot, db_manager))
