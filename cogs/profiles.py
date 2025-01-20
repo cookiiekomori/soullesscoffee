@@ -31,7 +31,7 @@ class Profiles(commands.Cog):
             await ctx.send("Профиль не найден.")
             return
 
-        custom_image_path = "C:\\Users\\cooki\\Pictures\\Adobe Images\\done\\Desiign_bot\\profile_design.png"
+        custom_image_path = "Pictures\\profile_design.png"
         custom_image = Image.open(custom_image_path)
 
         profile_image = Image.new("RGBA", custom_image.size, (255, 255, 255, 0)) 
@@ -91,7 +91,7 @@ class Profiles(commands.Cog):
         is_verified_bot_developer = user.public_flags.verified_bot_developer
 
         if is_active_developer or is_verified_bot_developer or is_early_verified_bot_developer:
-            additional_image_path = "C:\\Users\\cooki\\Pictures\\Adobe Images\\done\\Desiign_bot\\LOGO_prog.png" 
+            additional_image_path = "Pictures\\LOGO_prog.png" 
             if os.path.exists(additional_image_path):
                 additional_image = Image.open(additional_image_path).resize((54, 54))
                 profile_image.paste(additional_image, (25, 238), additional_image) 
