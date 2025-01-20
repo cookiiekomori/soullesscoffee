@@ -30,6 +30,8 @@ class Data(commands.Cog):
                         if in_data.empty:
                             df.loc[len(df)] = [guild.id, guild.name, member.name, member.id]
                         df.to_csv('Bases\\base_of_profiles.csv', index=False)
+
+            print(pd.read_csv("Bases\\base_of_profiles.csv"))
         else:
             await ctx.send("Недостаточно прав для использования этой команды!")
 
