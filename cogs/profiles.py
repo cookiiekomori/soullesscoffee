@@ -43,18 +43,31 @@ class Profiles(commands.Cog):
             avatar_response = requests.get(avatar_url)
 
             if avatar_response.status_code == 200:
-                avatar = Image.open(io.BytesIO(avatar_response.content)).resize((160, 160))  
+                # Проверяем, является ли аватарка GIF
+                if avatar_url.endswith('.gif'):
+                    avatar = Image.open(io.BytesIO(avatar_response.content)).convert("RGBA")
+                    avatar.seek(0)  # Переход к первому кадру
+                else:
+                    avatar = Image.open(io.BytesIO(avatar_response.content)).convert("RGBA").resize((160, 160))
 
+                # Если это GIF, изменяем размер
+                if avatar_url.endswith('.gif'):
+                    avatar = avatar.resize((160, 160))
+
+                # Создаем маску для аватара
                 mask = Image.new('L', (160, 160), 0)
                 draw = ImageDraw.Draw(mask)
                 draw.ellipse((0, 0, 160, 160), fill=255)
 
-                avatar.putalpha(mask)
-                profile_image.paste(avatar, (39, 29), avatar)
+                # Убедитесь, что аватар имеет альфа-канал
+                if avatar.mode != 'RGBA':
+                    avatar = avatar.convert('RGBA')
+
+                # Применяем маску
+                profile_image.paste(avatar, (39, 29), mask)
             else:
                 await ctx.send("Не удалось загрузить аватарку пользователя.")
                 return
-
 
         draw = ImageDraw.Draw(profile_image)
         
